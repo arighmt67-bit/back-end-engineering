@@ -1,0 +1,195 @@
+{
+	"id": "b50c9572-3381-4be2-bbb4-d7e5d02b0662",
+	"name": "[788] DicoEvent versi 1",
+	"values": [
+		{
+			"key": "host",
+			"value": "localhost",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "port",
+			"value": "8000",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "username",
+			"value": "dicoding",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "password",
+			"value": "1234qwer!@#$",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "refreshToken",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "userId",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "groupId",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "eventId",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "ticketId",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "newUsername",
+			"value": "DicodingIndonesia",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "usernameSuperUser",
+			"value": "Aras",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "passwordSuperUser",
+			"value": "1234qwer!@#$",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "accessTokenSuperUser",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "refreshTokenSuperUser",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "passwordAdmin",
+			"value": "1234qwer!@#$",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "adminId",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "refreshTokenAdmin",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "accessTokenAdmin",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "registrationId",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "paymentId",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "accessTokenOrganizerDicoding",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "refreshTokenOrganizerDicoding",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "accessTokenOtherOrganizer",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "refreshTokenOtherOrganizer",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "ownEventId",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "otherEventId",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "organizerDicodingId",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "otherOrganizerId",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "fileName",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "usernameAdmin",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2025-07-10T03:30:42.850Z",
+	"_postman_exported_using": "Postman/9.31.30"
+}

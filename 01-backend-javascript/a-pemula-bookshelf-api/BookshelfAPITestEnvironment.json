@@ -1,0 +1,7 @@
+{
+  "name": "Bookshelf API Test",
+  "values": [
+    {"key": "host", "value": "bookshelf-api-production-f112.up.railway.app", "enabled": true},
+    {"key": "port", "value": "", "enabled": true}
+  ]
+}

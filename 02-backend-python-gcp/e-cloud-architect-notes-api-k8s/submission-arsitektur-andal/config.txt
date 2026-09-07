@@ -1,0 +1,21 @@
+IP address: 8.232.179.128
+Project ID: project-183cf8ce-97a2-455e-aad
+Sharable link Google Cloud Pricing Calculator: https://cloud.google.com/products/calculator/estimate-preview/CiQ5ZGVlYWIzYS00ZmRkLTRjYjUtYmNiNy1kMTc1MDE0ZjNkMGMQAQ%3D%3D
+
+Fungsi/Kegunaan dari Setiap Metric:
+1. compute.googleapis.com/instance/cpu/utilization (CPU Utilization):
+   Memantau persentase utilisasi pemrosesan CPU pada masing-masing VM instance di managed instance group. Metrik ini krusial sebagai pemicu (trigger) autoscaling (target 80%) guna mendeteksi lonjakan beban traffic flash sale dan melakukan scale-out secara otomatis.
+2. compute.googleapis.com/instance/network/received_bytes_count (Network Inbound Traffic):
+   Memantau volume data masuk (incoming network traffic) dalam satuan bytes pada antarmuka jaringan VM. Berfungsi menganalisis kepadatan request pelanggan dan mendeteksi anomali lonjakan traffic atau potensi serangan DoS.
+3. compute.googleapis.com/instance/disk/read_bytes_count (Disk Read Bytes):
+   Memantau throughput operasi pembacaan disk storage persistent pada instance e-commerce. Berguna untuk memantau performa I/O disk saat aplikasi membaca aset statis dan file web e-commerce.
+4. loadbalancing.googleapis.com/https/request_count (Load Balancer Request Count):
+   Memantau total volume HTTP request yang diterima dan didistribusikan oleh Global External HTTP Load Balancer ke masing-masing backend instance group. Metrik ini memberikan visibilitas menyeluruh atas total traffic global dan pembagian beban antar region Asia dan Eropa.
+
+Alasan Pemilihan Machine Type, Region, dan Load Balancer Type:
+1. Alasan Pemilihan Machine Type (e2-micro):
+   Sesuai prinsip arsitektur cloud "Cost-Effective & Elastic Architecture", beban kerja aplikasi web e-commerce statis yang ringan sangat efisien dijalankan di atas machine type e2-micro (2 vCPU burstable, 1 GB RAM). Skalabilitas beban tinggi tidak ditangani dengan memperbesar ukuran mesin (vertical scaling), melainkan dengan Managed Instance Group Autoscaling (horizontal scaling). Hal ini menekan biaya operasional harian hingga level minimal (Rp 15.000 - Rp 25.000/hari) tanpa mengorbankan performa saat traffic melonjak.
+2. Alasan Pemilihan Region (asia-southeast2 & europe-west1):
+   Berdasarkan profil bisnis perusahaan yang memiliki basis pelanggan terbesar di Asia Tenggara dan Eropa, penempatan backend di region Jakarta (asia-southeast2) dan Belgium (europe-west1) menjamin kedekatan jarak fisik server dengan pengguna (edge proximity), menghasilkan latensi akses serendah mungkin, serta memenuhi regulasi data lokal di kedua benua.
+3. Alasan Pemilihan Load Balancer Type (Global External HTTP Load Balancer):
+   Global HTTP Load Balancer berbasis Google Anycast IP memungkinkan satu IP publik tunggal (8.232.179.128) dapat diakses dari seluruh dunia. Traffic dari pelanggan di Asia otomatis diarahkan ke backend Jakarta, sedangkan traffic dari Eropa diarahkan ke backend Belgium melalui Google Global Private Fiber Network. Apabila salah satu region mengalami kegagalan (outage), load balancer secara cerdas mengalihkan traffic ke region yang sehat (multi-region cross-regional failover) demi keandalan 99.99%.

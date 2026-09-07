@@ -1,0 +1,2 @@
+runtime: nodejs22
+service: backend

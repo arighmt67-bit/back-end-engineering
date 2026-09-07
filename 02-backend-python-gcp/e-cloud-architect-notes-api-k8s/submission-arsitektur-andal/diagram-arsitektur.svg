@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <linearGradient id="boxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#334155" />
+    </linearGradient>
+    <linearGradient id="gcpGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4285F4" />
+      <stop offset="25%" stop-color="#EA4335" />
+      <stop offset="50%" stop-color="#FBBC05" />
+      <stop offset="100%" stop-color="#34A853" />
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="800" fill="url(#bgGrad)" />
+
+  <!-- Header Banner -->
+  <rect x="40" y="30" width="1120" height="60" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="40" y="30" width="1120" height="4" fill="url(#gcpGrad)" />
+  <text x="60" y="68" fill="#f8fafc" font-size="20" font-weight="bold">Google Cloud Platform - Global Multi-Region E-Commerce Resilient Architecture</text>
+  <text x="880" y="67" fill="#94a3b8" font-size="13">Project ID: project-183cf8ce-97a2-455e-aad</text>
+
+  <!-- Global Users -->
+  <g transform="translate(60, 140)">
+    <rect width="180" height="120" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="90" y="35" fill="#38bdf8" font-size="15" font-weight="bold" text-anchor="middle">Global Clients</text>
+    <text x="90" y="65" fill="#e2e8f0" font-size="13" text-anchor="middle">Asia Tenggara dan Eropa</text>
+    <text x="90" y="90" fill="#94a3b8" font-size="12" text-anchor="middle">HTTP Client Traffic (Port 80)</text>
+  </g>
+
+  <!-- Global External HTTP LB -->
+  <g transform="translate(320, 120)">
+    <rect width="280" height="160" rx="8" fill="#1e293b" stroke="#4285F4" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="280" height="28" rx="8" fill="#1d4ed8"/>
+    <text x="140" y="19" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">Global External HTTP Load Balancer</text>
+    <text x="20" y="55" fill="#f8fafc" font-size="12" font-weight="bold">Frontend (Forwarding Rule):</text>
+    <text x="30" y="75" fill="#38bdf8" font-size="12">IP: 8.232.179.128:80 (HTTP)</text>
+    <text x="20" y="105" fill="#f8fafc" font-size="12" font-weight="bold">Backend Service:</text>
+    <text x="30" y="125" fill="#94a3b8" font-size="11">ecommerce-backend-service</text>
+    <text x="30" y="145" fill="#34d399" font-size="11">Health Check: http-basic-check (/) [200 OK]</text>
+  </g>
+
+  <!-- Arrows from Users to LB -->
+  <path d="M 240 200 L 320 200" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="6,4" />
+  <polygon points="320,200 310,195 310,205" fill="#38bdf8" />
+
+  <!-- VPC Container -->
+  <rect x="40" y="320" width="1120" height="440" rx="10" fill="#0f172a" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <text x="60" y="350" fill="#cbd5e1" font-size="16" font-weight="bold">Custom VPC Network: vpc-ecommerce (Mode: Custom)</text>
+  <text x="680" y="350" fill="#94a3b8" font-size="12">Firewalls: allow-http-traffic (0.0.0.0/0:80), allow-health-check</text>
+
+  <!-- Region 1: Asia Southeast 2 (Jakarta) -->
+  <g transform="translate(70, 380)">
+    <rect width="500" height="350" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="500" height="32" rx="8" fill="#1e40af"/>
+    <text x="250" y="21" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">Region: asia-southeast2 (Jakarta, Indonesia)</text>
+    
+    <rect x="20" y="50" width="460" height="60" rx="6" fill="#0f172a" stroke="#475569" stroke-width="1"/>
+    <text x="35" y="75" fill="#38bdf8" font-size="13" font-weight="bold">Subnet: subnet-asia-southeast2</text>
+    <text x="35" y="95" fill="#94a3b8" font-size="12">CIDR Range: 10.10.0.0/24 | Zone: asia-southeast2-a</text>
+
+    <!-- MIG Asia -->
+    <rect x="20" y="130" width="460" height="195" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="35" y="155" fill="#f8fafc" font-size="13" font-weight="bold">Managed Instance Group: mig-asia</text>
+    <text x="35" y="175" fill="#34d399" font-size="11">Autoscaling: Active (Min: 1, Max: 2 Replicas, Target CPU: 80%)</text>
+    <text x="35" y="195" fill="#94a3b8" font-size="11">Instance Template: template-asia (Machine Type: e2-micro)</text>
+    
+    <!-- VM Card 1 -->
+    <rect x="35" y="210" width="200" height="100" rx="4" fill="#0f172a" stroke="#22c55e" stroke-width="1"/>
+    <text x="45" y="232" fill="#22c55e" font-size="12" font-weight="bold">&#9679; mig-asia-cptq (Active)</text>
+    <text x="45" y="252" fill="#cbd5e1" font-size="11">Internal IP: 10.10.0.2</text>
+    <text x="45" y="272" fill="#94a3b8" font-size="11">Role: E-Commerce Web</text>
+    <text x="45" y="292" fill="#38bdf8" font-size="10">Startup: httplb/startup.sh</text>
+
+    <!-- VM Card 2 (Autoscale placeholder) -->
+    <rect x="255" y="210" width="200" height="100" rx="4" fill="#0f172a" stroke="#64748b" stroke-width="1" stroke-dasharray="3,3"/>
+    <text x="265" y="232" fill="#94a3b8" font-size="12">&#9675; mig-asia-scale (Autoscale)</text>
+    <text x="265" y="252" fill="#64748b" font-size="11">Target: CPU &gt; 80%</text>
+    <text x="265" y="272" fill="#64748b" font-size="11">Max Replicas: 2</text>
+    <text x="265" y="292" fill="#64748b" font-size="10">Zone: asia-southeast2-a</text>
+  </g>
+
+  <!-- Region 2: Europe West 1 (Belgium) -->
+  <g transform="translate(620, 380)">
+    <rect width="500" height="350" rx="8" fill="#1e293b" stroke="#8b5cf6" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="500" height="32" rx="8" fill="#6d28d9"/>
+    <text x="250" y="21" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">Region: europe-west1 (Belgium, Europe)</text>
+    
+    <rect x="20" y="50" width="460" height="60" rx="6" fill="#0f172a" stroke="#475569" stroke-width="1"/>
+    <text x="35" y="75" fill="#a78bfa" font-size="13" font-weight="bold">Subnet: subnet-europe-west1</text>
+    <text x="35" y="95" fill="#94a3b8" font-size="12">CIDR Range: 10.20.0.0/24 | Zone: europe-west1-b</text>
+
+    <!-- MIG EU -->
+    <rect x="20" y="130" width="460" height="195" rx="6" fill="#1e293b" stroke="#8b5cf6" stroke-width="1.5"/>
+    <text x="35" y="155" fill="#f8fafc" font-size="13" font-weight="bold">Managed Instance Group: mig-eu</text>
+    <text x="35" y="175" fill="#34d399" font-size="11">Autoscaling: Active (Min: 1, Max: 2 Replicas, Target CPU: 80%)</text>
+    <text x="35" y="195" fill="#94a3b8" font-size="11">Instance Template: template-eu (Machine Type: e2-micro)</text>
+    
+    <!-- VM Card 1 -->
+    <rect x="35" y="210" width="200" height="100" rx="4" fill="#0f172a" stroke="#22c55e" stroke-width="1"/>
+    <text x="45" y="232" fill="#22c55e" font-size="12" font-weight="bold">&#9679; mig-eu-frrl (Active)</text>
+    <text x="45" y="252" fill="#cbd5e1" font-size="11">Internal IP: 10.20.0.3</text>
+    <text x="45" y="272" fill="#94a3b8" font-size="11">Role: E-Commerce Web</text>
+    <text x="45" y="292" fill="#a78bfa" font-size="10">Startup: httplb/startup.sh</text>
+
+    <!-- VM Card 2 (Autoscale placeholder) -->
+    <rect x="255" y="210" width="200" height="100" rx="4" fill="#0f172a" stroke="#64748b" stroke-width="1" stroke-dasharray="3,3"/>
+    <text x="265" y="232" fill="#94a3b8" font-size="12">&#9675; mig-eu-scale (Autoscale)</text>
+    <text x="265" y="252" fill="#64748b" font-size="11">Target: CPU &gt; 80%</text>
+    <text x="265" y="272" fill="#64748b" font-size="11">Max Replicas: 2</text>
+    <text x="265" y="292" fill="#64748b" font-size="10">Zone: europe-west1-b</text>
+  </g>
+
+  <!-- Connecting Lines from LB to Subnets -->
+  <path d="M 400 280 L 400 380" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4,3"/>
+  <polygon points="400,380 395,370 405,370" fill="#3b82f6"/>
+  <path d="M 520 280 L 520 300 L 800 300 L 800 380" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="4,3"/>
+  <polygon points="800,380 795,370 805,370" fill="#8b5cf6"/>
+
+  <!-- External Auditor & Monitoring Box -->
+  <g transform="translate(680, 120)">
+    <rect width="440" height="160" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="440" height="28" rx="8" fill="#065f46"/>
+    <text x="220" y="19" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">Auditing dan Observability</text>
+    <text x="20" y="55" fill="#f8fafc" font-size="12" font-weight="bold">External Auditor (Least Privilege):</text>
+    <text x="30" y="75" fill="#34d399" font-size="11">Member: group:reviewer_googlecloud@dicoding.com</text>
+    <text x="30" y="93" fill="#94a3b8" font-size="11">Roles: Compute Viewer, Monitoring Viewer, Browser</text>
+    <text x="20" y="120" fill="#f8fafc" font-size="12" font-weight="bold">Cloud Monitoring Custom Dashboard:</text>
+    <text x="30" y="140" fill="#e2e8f0" font-size="11">Name: "Dashboard - Submission" (4 Chart Metrics)</text>
+  </g>
+</svg>

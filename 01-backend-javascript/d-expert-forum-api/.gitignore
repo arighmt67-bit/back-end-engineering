@@ -1,0 +1,6 @@
+node_modules
+.idea
+config/database/test.json
+coverage
+.env
+.test.env

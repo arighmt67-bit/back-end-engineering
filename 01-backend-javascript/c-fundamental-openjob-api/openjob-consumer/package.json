@@ -1,0 +1,27 @@
+{
+  "name": "openjob-consumer",
+  "version": "1.0.0",
+  "description": "Consumer RabbitMQ OpenJob: memproses lamaran baru secara asynchronous dan mengirim email notifikasi kepada pemilik lowongan menggunakan Nodemailer.",
+  "main": "src/consumer.js",
+  "scripts": {
+    "start": "node src/consumer.js",
+    "start:dev": "nodemon src/consumer.js"
+  },
+  "keywords": [
+    "rabbitmq",
+    "consumer",
+    "nodemailer",
+    "openjob"
+  ],
+  "author": "Ari Rahmat Romadhon",
+  "license": "MIT",
+  "dependencies": {
+    "amqplib": "^2.0.1",
+    "dotenv": "^16.4.5",
+    "nodemailer": "^9.0.6",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}

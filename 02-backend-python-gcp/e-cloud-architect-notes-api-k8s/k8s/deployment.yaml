@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notes-api-deployment
+  labels:
+    app: notes-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notes-api
+  template:
+    metadata:
+      labels:
+        app: notes-api
+    spec:
+      containers:
+      - name: notes-api
+        image: asia-southeast2-docker.pkg.dev/project-bbbe31b4-c727-4c5a-96a/notes-api-repo/notes-api:v1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5000

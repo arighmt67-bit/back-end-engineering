@@ -1,0 +1,551 @@
+[
+ {
+  "folder": "[Mandatory] Users",
+  "name": "Log In As a Super User With Valid Data",
+  "method": "POST",
+  "url": "/api/login/",
+  "auth_hdr": [],
+  "body": "{\n    \"username\": \"{{usernameSuperUser}}\",\n    \"password\": \"{{passwordSuperUser}}\"\n}",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body should contain refresh and access tokens', () => {\n    const responseJson = pm.response.json();\n    \n    pm.expect(responseJson).to.have.property('refresh').that.is.a('string').and.is.not.empty;\n    pm.expect(responseJson).to.have.property('access').that.is.a('string').and.is.not.empty;\n\n    pm.environment.set('refreshTokenSuperUser', responseJson.refresh);\n    pm.environment.set('accessTokenSuperUser', responseJson.access);\n});"
+ },
+ {
+  "folder": "[Mandatory] Users",
+  "name": "Add New Users",
+  "method": "POST",
+  "url": "/api/users/",
+  "auth_hdr": [],
+  "body": "{\n    \"username\": \"{{username}}_{{$timestamp}}\",\n    \"password\": \"{{password}}\",\n    \"email\": \"aras_{{$timestamp}}@gmail.com\"\n}",
+  "tests": "pm.test('it should response 201 status code', () => {\n    pm.expect(pm.response).to.have.status(201);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body should have correct property types and non-empty ID', () => {\n    const responseJson = pm.response.json();\n    \n    pm.expect(responseJson).to.have.property('id').that.is.a('string').and.is.not.empty;\n    pm.expect(responseJson).to.have.property('username').that.is.a('string');\n\n    pm.environment.set('userId', responseJson.id);\n});\n\npm.test('response body should have correct property types and non-empty ID', () => {\n    const responseJson = pm.response.json();\n\n    pm.expect(responseJson).to.have.property('id').that.is.a('string').and.is.not.empty;\n    pm.expect(responseJson).to.have.property('username').that.is.a('string');\n\n    pm.environment.set('username', responseJson.username);\n    pm.environment.set('userId', responseJson.id);\n});"
+ },
+ {
+  "folder": "[Mandatory] Users",
+  "name": "Log In As a User With Valid Data",
+  "method": "POST",
+  "url": "/api/login/",
+  "auth_hdr": [],
+  "body": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body should contain refresh and access tokens', () => {\n    const responseJson = pm.response.json();\n    \n    pm.expect(responseJson).to.have.property('refresh').that.is.a('string').and.is.not.empty;\n    pm.expect(responseJson).to.have.property('access').that.is.a('string').and.is.not.empty;\n\n    pm.environment.set('refreshToken', responseJson.refresh);\n    pm.environment.set('accessToken', responseJson.access);\n});"
+ },
+ {
+  "folder": "[Mandatory] Users",
+  "name": "[Admin/Superuser] Get All Users",
+  "method": "GET",
+  "url": "/api/users/",
+  "auth_hdr": [],
+  "body": "",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body have correct property and value', () => {\n    const responseJson = pm.response.json();\n\n    pm.expect(responseJson.users).to.be.an('array');\n    pm.expect(responseJson.users).to.length.least(1);\n});"
+ },
+ {
+  "folder": "[Mandatory] Users",
+  "name": "[User] Try Access Get All Users",
+  "method": "GET",
+  "url": "/api/users/",
+  "auth_hdr": [],
+  "body": "",
+  "tests": "pm.test('it should response 403 status code', () => {\n    pm.expect(pm.response).to.have.status(403);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n});"
+ },
+ {
+  "folder": "[Mandatory] Users",
+  "name": "Get Detail Users",
+  "method": "GET",
+  "url": "/api/users/{{userId}}/",
+  "auth_hdr": [],
+  "body": "",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body should have correct property and value', () => {\n    const responseJson = pm.response.json();\n\n    pm.expect(responseJson).to.have.property('username').to.be.an('string')\n    pm.expect(responseJson).to.have.property('email').to.be.an('string')\n    pm.expect(responseJson).to.have.property('first_name').to.be.an('string')\n    pm.expect(responseJson).to.have.property('last_name').to.be.an('string')\n});\n"
+ },
+ {
+  "folder": "[Mandatory] Users",
+  "name": "Edit Users with Valid Data",
+  "method": "PUT",
+  "url": "/api/users/{{userId}}/",
+  "auth_hdr": [],
+  "body": "{\n    \"username\": \"DicodingIndonesia\",\n    \"password\": \"{{password}}\",\n    \"email\": \"new_email_{{$timestamp}}@gmail.com\"\n}",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('when GET users details after update', () => {\n    const userId = pm.environment.get('userId');\n    const host = pm.environment.get('host');\n    const port = pm.environment.get('port');\n\n    pm.sendRequest(`http://${host}:${port}/api/users/${userId}/`, (error, response) => {\n        if (!error) {\n            pm.test('it should response with revised content', () => {\n                pm.expect(response.code).to.equal(200);\n\n                const responseJson = response.json();\n                \n                pm.expect(responseJson.id).to.equal(userId);\n                pm.expect(responseJson.username).to.equal('DicodingIndonesia');\n            });\n        }\n    });\n});"
+ },
+ {
+  "folder": "[Mandatory] Users",
+  "name": "[Admin/Superuser] Delete Users",
+  "method": "DELETE",
+  "url": "/api/users/{{userId}}/",
+  "auth_hdr": [],
+  "body": "",
+  "tests": "pm.test('it should response 204 status code', () => {\n    pm.expect(pm.response).to.have.status(204);\n});\n\npm.test('when GET users details after delete', () => {\n    const userId = pm.environment.get('userId');\n\n    pm.sendRequest(`http://{{host}}:{{port}}/api/users/${userId}`, (error, response) => {\n        if (!error) {\n            pm.test('it should response with 404 status code', () => {\n                pm.expect(response.code).to.equal(404);\n            });\n        }\n    });\n});"
+ },
+ {
+  "folder": "[Mandatory] Users",
+  "name": "Add New Users After Delete",
+  "method": "POST",
+  "url": "/api/users/",
+  "auth_hdr": [],
+  "body": "{\n    \"username\": \"{{username}}_{{$timestamp}}\",\n    \"password\": \"{{password}}\",\n    \"email\": \"email_{{$timestamp}}@gmail.com\"\n}",
+  "tests": "pm.test('it should response 201 status code', () => {\n    pm.expect(pm.response).to.have.status(201);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body should have correct property types and non-empty ID', () => {\n    const responseJson = pm.response.json();\n    \n    pm.expect(responseJson).to.have.property('id').that.is.a('string').and.is.not.empty;\n    pm.expect(responseJson).to.have.property('username').that.is.a('string');\n\n    pm.environment.set('username', responseJson.username);\n    pm.environment.set('userId', responseJson.id);\n});\n"
+ },
+ {
+  "folder": "[Mandatory] Users",
+  "name": "Log In As a User After Delete",
+  "method": "POST",
+  "url": "/api/login/",
+  "auth_hdr": [],
+  "body": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body should contain refresh and access tokens', () => {\n    const responseJson = pm.response.json();\n    \n    pm.expect(responseJson).to.have.property('refresh').that.is.a('string').and.is.not.empty;\n    pm.expect(responseJson).to.have.property('access').that.is.a('string').and.is.not.empty;\n\n    pm.environment.set('refreshToken', responseJson.refresh);\n    pm.environment.set('accessToken', responseJson.access);\n});"
+ },
+ {
+  "folder": "[Mandatory] Users",
+  "name": "Refresh Token",
+  "method": "POST",
+  "url": "/api/token/",
+  "auth_hdr": [],
+  "body": "{\n    \"refresh\": \"{{refreshToken}}\"\n}",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body should contain access tokens', () => {\n    const responseJson = pm.response.json();\n    \n    pm.expect(responseJson).to.have.property('access').that.is.a('string').and.is.not.empty;\n\n    pm.environment.set('accessToken', responseJson.access);\n});"
+ },
+ {
+  "folder": "[Mandatory] Groups",
+  "name": "[Superuser] Add New Groups",
+  "method": "POST",
+  "url": "/api/groups/",
+  "auth_hdr": [],
+  "body": "{\n    \"name\": \"admin\"\n}",
+  "tests": "pm.test('it should response 201 status code', () => {\n    pm.expect(pm.response).to.have.status(201);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body should have correct property types and non-empty ID', () => {\n    const responseJson = pm.response.json();\n    \n    pm.expect(responseJson).to.have.property('id').that.is.a('number').above(0)\n    pm.expect(responseJson).to.have.property('name').that.is.a('string');\n\n    pm.environment.set('groupId', responseJson.id);\n});\n"
+ },
+ {
+  "folder": "[Mandatory] Groups",
+  "name": "[Superuser] Get All Groups",
+  "method": "GET",
+  "url": "/api/groups/",
+  "auth_hdr": [],
+  "body": "",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body have correct property and value', () => {\n    const responseJson = pm.response.json();\n\n    pm.expect(responseJson.groups).to.be.an('array');\n    pm.expect(responseJson.groups).to.length.least(1);\n});"
+ },
+ {
+  "folder": "[Mandatory] Groups",
+  "name": "[Superuser] Edit Groups with Valid Data",
+  "method": "PUT",
+  "url": "/api/groups/{{groupId}}/",
+  "auth_hdr": [],
+  "body": "{\n    \"name\": \"Cashier\"\n}",
+  "tests": ""
+ },
+ {
+  "folder": "[Mandatory] Groups",
+  "name": "[Superuser] Delete Groups",
+  "method": "DELETE",
+  "url": "/api/groups/{{groupId}}/",
+  "auth_hdr": [],
+  "body": "",
+  "tests": "pm.test('it should response 204 status code', () => {\n    pm.expect(pm.response).to.have.status(204);\n});\n\npm.test('when GET studios details after delete', () => {\n    const groupId = pm.environment.get('groupId');\n    \n    pm.sendRequest(`http://{{host}}:{{port}}/api/groups/${groupId}`, (error, response) => {\n        if (!error) {\n            pm.test('it should response with 404 status code', () => {\n                pm.expect(response.code).to.equal(404);\n            });\n        }\n    });\n});"
+ },
+ {
+  "folder": "[Mandatory] Groups",
+  "name": "[Superuser] Add New Groups After Delete",
+  "method": "POST",
+  "url": "/api/groups/",
+  "auth_hdr": [],
+  "body": "{\n    \"name\": \"admin\"\n}",
+  "tests": "pm.test('it should response 201 status code', () => {\n    pm.expect(pm.response).to.have.status(201);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body should have correct property types and non-empty ID', () => {\n    const responseJson = pm.response.json();\n    \n    pm.expect(responseJson).to.have.property('id').that.is.a('number').above(0)\n    pm.expect(responseJson).to.have.property('name').that.is.a('string');\n\n    pm.environment.set('groupId', responseJson.id);\n});\n"
+ },
+ {
+  "folder": "[Mandatory] Admin",
+  "name": "Add New Admin",
+  "method": "POST",
+  "url": "/api/users/",
+  "auth_hdr": [],
+  "body": "{\n    \"username\": \"{{username}}_{{$timestamp}}\",\n    \"password\": \"{{password}}\",\n    \"email\": \"admin@gmail.com\"\n}",
+  "tests": "pm.test('it should response 201 status code', () => {\n    pm.expect(pm.response).to.have.status(201);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body should have correct property types and non-empty ID', () => {\n    const responseJson = pm.response.json();\n    \n    pm.expect(responseJson).to.have.property('id').that.is.a('string').and.is.not.empty;\n    pm.expect(responseJson).to.have.property('username').that.is.a('string');\n});\n\npm.test('response body should have correct property types and non-empty ID', () => {\n    const responseJson = pm.response.json();\n\n    pm.expect(responseJson).to.have.property('id').that.is.a('string').and.is.not.empty;\n    pm.expect(responseJson).to.have.property('username').that.is.a('string');\n\n    pm.environment.set('usernameAdmin', responseJson.username);\n    pm.environment.set('adminId', responseJson.id);\n});"
+ },
+ {
+  "folder": "[Mandatory] Admin",
+  "name": "[Superuser] Assign The User to The Admin Role",
+  "method": "POST",
+  "url": "/api/assign-roles/",
+  "auth_hdr": [],
+  "body": "{\n    \"user_id\": \"{{adminId}}\",\n    \"group_id\": \"{{groupId}}\"\n}",
+  "tests": "pm.test('it should response 201 status code', () => {\n    pm.expect(pm.response).to.have.status(201);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n});"
+ },
+ {
+  "folder": "[Mandatory] Admin",
+  "name": "Log In As a Admin With Valid Data",
+  "method": "POST",
+  "url": "/api/login/",
+  "auth_hdr": [],
+  "body": "{\n    \"username\": \"{{usernameAdmin}}\",\n    \"password\": \"{{password}}\"\n}",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body should contain refresh and access tokens', () => {\n    const responseJson = pm.response.json();\n    \n    pm.expect(responseJson).to.have.property('refresh').that.is.a('string').and.is.not.empty;\n    pm.expect(responseJson).to.have.property('access').that.is.a('string').and.is.not.empty;\n\n    pm.environment.set('refreshTokenAdmin', responseJson.refresh);\n    pm.environment.set('accessTokenAdmin', responseJson.access);\n});"
+ },
+ {
+  "folder": "[Mandatory] Admin",
+  "name": "[Admin] Try Assigning the User to the Admin Role.",
+  "method": "POST",
+  "url": "/api/assign-roles/",
+  "auth_hdr": [],
+  "body": "{\n    \"user_id\": \"{{adminId}}\",\n    \"group_id\": \"{{groupId}}\"\n}",
+  "tests": "pm.test('it should response 403 status code', () => {\n    pm.expect(pm.response).to.have.status(403);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n});"
+ },
+ {
+  "folder": "[Mandatory] Events",
+  "name": "[Admin/Superuser] Add New Events with Valid Data",
+  "method": "POST",
+  "url": "/api/events/",
+  "auth_hdr": [],
+  "body": "{\n    \"name\": \"DevCoach 197: Back-End Python | REST API HARUS PAKAI HATEOAS? Ini Jawabannya!\",\n    \"description\": \"Dalam sesi ini, kalian akan belajar membuat web service pakai Django dari nol! Kita bahas tools, package manager, struktur Django, hingga RESTful API dengan Django REST Framework. Cocok banget buat kalian yang mau jadi back-end developer berbasis Python.\",\n    \"location\": \"Online\",\n    \"start_time\": \"2025-06-04 16:00\",\n    \"end_time\": \"2025-06-04 17:00\",\n    \"status\": \"scheduled\",\n    \"quota\": 200,\n    \"category\": \"Seminar\",\n    \"organizer_id\": \"{{userId}}\"\n}",
+  "tests": "pm.test('it should response 201 status code', () => {\n    pm.expect(pm.response).to.have.status(201);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body should have correct property types and non-empty ID', () => {\n    const responseJson = pm.response.json();\n    \n    pm.expect(responseJson).to.have.property('id').that.is.a('string').and.is.not.empty;\n    pm.expect(responseJson).to.have.property('name').that.is.a('string');\n    pm.expect(responseJson).to.have.property('description').that.is.a('string');\n    pm.expect(responseJson).to.have.property('location').that.is.a('string');\n    pm.expect(responseJson).to.have.property('start_time').that.is.a('string');\n    pm.expect(responseJson).to.have.property('end_time').that.is.a('string');\n    pm.expect(responseJson).to.have.property('status').that.is.a('string');\n    pm.expect(responseJson).to.have.property('category').that.is.a('string');\n    pm.expect(responseJson).to.have.property('quota').that.is.a('number');\n\n    pm.environment.set('eventId', responseJson.id);\n});\n"
+ },
+ {
+  "folder": "[Mandatory] Events",
+  "name": "Get All Events",
+  "method": "GET",
+  "url": "/api/events/",
+  "auth_hdr": [],
+  "body": "",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body have correct property and value', () => {\n    const responseJson = pm.response.json();\n\n    pm.expect(responseJson.events).to.be.an('array');\n    pm.expect(responseJson.events).to.length.least(1);\n});"
+ },
+ {
+  "folder": "[Mandatory] Events",
+  "name": "Get Detail Event",
+  "method": "GET",
+  "url": "/api/events/{{eventId}}/",
+  "auth_hdr": [],
+  "body": "",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body should have correct property and value', () => {\n    const responseJson = pm.response.json();\n\n    pm.expect(responseJson).to.have.property('name').to.be.an('string')\n    pm.expect(responseJson).to.have.property('description').to.be.an('string')\n    pm.expect(responseJson).to.have.property('location').to.be.an('string')\n    pm.expect(responseJson).to.have.property('start_time').to.be.an('string')\n    pm.expect(responseJson).to.have.property('end_time').to.be.an('string')\n    pm.expect(responseJson).to.have.property('status').to.be.an('string')\n    pm.expect(responseJson).to.have.property('quota').to.be.an('number')\n    pm.expect(responseJson).to.have.property('category').to.be.an('string')\n});\n"
+ },
+ {
+  "folder": "[Mandatory] Events",
+  "name": "[Admin/Superuser] Edit Events with Valid Data",
+  "method": "PUT",
+  "url": "/api/events/{{eventId}}/",
+  "auth_hdr": [],
+  "body": "{\n    \"name\": \"DevCoach 197: Back-End Python | REST API HARUS PAKAI HATEOAS? Ini Jawabannya!\",\n    \"description\": \"Dalam sesi ini, kalian akan belajar membuat web service pakai Django dari nol! Kita bahas tools, package manager, struktur Django, hingga RESTful API dengan Django REST Framework. Cocok banget buat kalian yang mau jadi back-end developer berbasis Python.\",\n    \"location\": \"Online\",\n    \"start_time\": \"2025-06-04 16:00\",\n    \"end_time\": \"2025-06-04 17:00\",\n    \"status\": \"scheduled\",\n    \"quota\": 250,\n    \"category\": \"Seminar\",\n    \"organizer_id\": \"{{userId}}\"\n}",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('when GET event details after update', () => {\n    const eventId = pm.environment.get('eventId');\n    const host = pm.environment.get('host');\n    const port = pm.environment.get('port');\n\n    pm.sendRequest(`http://${host}:${port}/api/events/${eventId}/`, (error, response) => {\n        if (!error) {\n            pm.test('it should response with revised content', () => {\n                pm.expect(response.code).to.equal(200);\n\n                const responseJson = response.json();\n\n                pm.expect(responseJson).to.be.an('object');\n                pm.expect(responseJson.id).to.equal(eventId);\n                pm.expect(responseJson.quota).to.equal(250);\n            });\n        }\n    });\n});"
+ },
+ {
+  "folder": "[Mandatory] Events",
+  "name": "[Admin/Superuser] Delete Events",
+  "method": "DELETE",
+  "url": "/api/events/{{eventId}}/",
+  "auth_hdr": [],
+  "body": "",
+  "tests": "pm.test('it should response 204 status code', () => {\n    pm.expect(pm.response).to.have.status(204);\n});\n\npm.test('when GET event details after delete', () => {\n    const eventId = pm.environment.get('eventId');\n\n    pm.sendRequest(`http://{{host}}:{{port}}/api/movies/${eventId}`, (error, response) => {\n        if (!error) {\n            pm.test('it should response with 404 status code', () => {\n                pm.expect(response.code).to.equal(404);\n            });\n        }\n    });\n});\n"
+ },
+ {
+  "folder": "[No test] Prerequisite",
+  "name": "Add New Events",
+  "method": "POST",
+  "url": "/api/events/",
+  "auth_hdr": [],
+  "body": "{\n    \"name\": \"DevCoach 197: Back-End Python | REST API HARUS PAKAI HATEOAS? Ini Jawabannya!\",\n    \"description\": \"Dalam sesi ini, kalian akan belajar membuat web service pakai Django dari nol! Kita bahas tools, package manager, struktur Django, hingga RESTful API dengan Django REST Framework. Cocok banget buat kalian yang mau jadi back-end developer berbasis Python.\",\n    \"location\": \"Online\",\n    \"start_time\": \"2025-06-04 16:00\",\n    \"end_time\": \"2025-06-04 17:00\",\n    \"status\": \"scheduled\",\n    \"quota\": 200,\n    \"category\": \"Seminar\",\n    \"organizer_id\": \"{{userId}}\"\n}",
+  "tests": "const responseJson = pm.response.json();\npm.environment.set('eventId', responseJson.id);"
+ },
+ {
+  "folder": "[Mandatory] Tickets",
+  "name": "[Admin/Organizer] Add New Tickets with Valid Data",
+  "method": "POST",
+  "url": "/api/tickets/",
+  "auth_hdr": [],
+  "body": "{\n    \"event_id\": \"{{eventId}}\",\n    \"name\": \"VIP\",\n    \"price\": 200000,\n    \"sales_start\": \"2025-06-04 16:00\",\n    \"sales_end\": \"2025-06-12 16:00\",\n    \"quota\": 200\n}",
+  "tests": "pm.test('it should response 201 status code', () => {\n    pm.expect(pm.response).to.have.status(201);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body should have correct property types and non-empty ID', () => {\n    const responseJson = pm.response.json();\n    \n    pm.expect(responseJson).to.have.property('id').that.is.a('string').and.is.not.empty;\n    pm.expect(responseJson).to.have.property('name').that.is.a('string');\n    pm.expect(responseJson).to.have.property('price').that.is.a('number');\n    pm.expect(responseJson).to.have.property('sales_start').that.is.a('string');\n    pm.expect(responseJson).to.have.property('sales_end').that.is.a('string');\n    pm.expect(responseJson).to.have.property('quota').that.is.a('number');\n\n    pm.environment.set('ticketId', responseJson.id);\n});\n"
+ },
+ {
+  "folder": "[Mandatory] Tickets",
+  "name": "Get All Tickets",
+  "method": "GET",
+  "url": "/api/tickets/",
+  "auth_hdr": [],
+  "body": "",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body have correct property and value', () => {\n    const responseJson = pm.response.json();\n\n    pm.expect(responseJson.tickets).to.be.an('array');\n    pm.expect(responseJson.tickets).to.length.least(1);\n});"
+ },
+ {
+  "folder": "[Mandatory] Tickets",
+  "name": "Get Detail Ticket",
+  "method": "GET",
+  "url": "/api/tickets/{{ticketId}}",
+  "auth_hdr": [],
+  "body": "",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body have correct property and value', () => {\n    const responseJson = pm.response.json();\n\n    pm.expect(responseJson).to.have.property('event').to.be.an('string')\n    pm.expect(responseJson).to.have.property('name').to.be.an('string')\n    pm.expect(responseJson).to.have.property('price').to.be.an('number')\n    pm.expect(responseJson).to.have.property('sales_start').to.be.an('string')\n    pm.expect(responseJson).to.have.property('sales_end').to.be.an('string')\n    pm.expect(responseJson).to.have.property('quota').to.be.an('number')\n});"
+ },
+ {
+  "folder": "[Mandatory] Tickets",
+  "name": "[Admin/Superuser] Edit Tickets with Valid Data",
+  "method": "PUT",
+  "url": "/api/tickets/{{ticketId}}/",
+  "auth_hdr": [],
+  "body": "{\n    \"event_id\": \"{{eventId}}\",\n    \"name\": \"VIP Plus\",\n    \"price\": 200000,\n    \"sales_start\": \"2025-06-04 16:00\",\n    \"sales_end\": \"2025-06-12 16:00\",\n    \"quota\": 200\n}",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('when GET ticket details after update', () => {\n    const ticketId = pm.environment.get('ticketId');\n    const host = pm.environment.get('host');\n    const port = pm.environment.get('port');\n\n    pm.sendRequest(`http://${host}:${port}/api/tickets/${ticketId}/`, (error, response) => {\n        if (!error) {\n            pm.test('it should response with revised content', () => {\n                pm.expect(response.code).to.equal(200);\n\n                const responseJson = response.json();\n\n                pm.expect(responseJson).to.be.an('object');\n                pm.expect(responseJson.id).to.equal(ticketId);\n                pm.expect(responseJson.name).to.equal(\"VIP Plus\");\n            });\n        }\n    });\n});"
+ },
+ {
+  "folder": "[Mandatory] Tickets",
+  "name": "[Admin/Superuser] Delete Tickets",
+  "method": "DELETE",
+  "url": "/api/tickets/{{ticketId}}/",
+  "auth_hdr": [],
+  "body": "",
+  "tests": "pm.test('it should response 204 status code', () => {\n    pm.expect(pm.response).to.have.status(204);\n});\n\npm.test('when GET ticket details after delete', () => {\n    const ticketId = pm.environment.get('ticketId');\n\n    pm.sendRequest(`http://{{host}}:{{port}}/api/tickets/${ticketId}`, (error, response) => {\n        if (!error) {\n            pm.test('it should response with 404 status code', () => {\n                pm.expect(response.code).to.equal(404);\n            });\n        }\n    });\n});\n"
+ },
+ {
+  "folder": "[No test] Prerequisite",
+  "name": "Add New Events",
+  "method": "POST",
+  "url": "/api/events/",
+  "auth_hdr": [],
+  "body": "{\n    \"name\": \"DevCoach 197: Back-End Python | REST API HARUS PAKAI HATEOAS? Ini Jawabannya!\",\n    \"description\": \"Dalam sesi ini, kalian akan belajar membuat web service pakai Django dari nol! Kita bahas tools, package manager, struktur Django, hingga RESTful API dengan Django REST Framework. Cocok banget buat kalian yang mau jadi back-end developer berbasis Python.\",\n    \"location\": \"Online\",\n    \"start_time\": \"2025-06-04 16:00\",\n    \"end_time\": \"2025-06-04 17:00\",\n    \"status\": \"scheduled\",\n    \"quota\": 200,\n    \"category\": \"Seminar\",\n    \"organizer_id\": \"{{userId}}\"\n}",
+  "tests": "const responseJson = pm.response.json();\npm.environment.set('eventId', responseJson.id);"
+ },
+ {
+  "folder": "[No test] Prerequisite",
+  "name": "Add New Tickets",
+  "method": "POST",
+  "url": "/api/tickets/",
+  "auth_hdr": [],
+  "body": "{\n    \"event_id\": \"{{eventId}}\",\n    \"name\": \"VIP\",\n    \"price\": 200000,\n    \"sales_start\": \"2025-06-04 16:00\",\n    \"sales_end\": \"2025-06-12 16:00\",\n    \"quota\": 200\n}",
+  "tests": "const responseJson = pm.response.json();\npm.environment.set('ticketId', responseJson.id);"
+ },
+ {
+  "folder": "[Mandatory] Registrations",
+  "name": "Add New Registrations with Valid Data",
+  "method": "POST",
+  "url": "/api/registrations/",
+  "auth_hdr": [],
+  "body": "{\n    \"ticket_id\": \"{{ticketId}}\",\n    \"user_id\": \"{{userId}}\"\n}",
+  "tests": "pm.test('it should response 201 status code', () => {\n    pm.expect(pm.response).to.have.status(201);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body should have correct property types and non-empty ID', () => {\n    const responseJson = pm.response.json();\n    \n    pm.expect(responseJson).to.have.property('id').that.is.a('string').and.is.not.empty;\n    pm.expect(responseJson).to.have.property('ticket').that.is.a('string');\n    pm.expect(responseJson).to.have.property('user').that.is.a('string');\n\n    pm.environment.set('registrationId', responseJson.id);\n});\n"
+ },
+ {
+  "folder": "[Mandatory] Registrations",
+  "name": "[Admin/Superuser] Get All Registrations",
+  "method": "GET",
+  "url": "/api/registrations/",
+  "auth_hdr": [],
+  "body": "",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body have correct property and value', () => {\n    const responseJson = pm.response.json();\n\n    pm.expect(responseJson.registrations).to.be.an('array');\n    pm.expect(responseJson.registrations).to.length.least(1);\n});"
+ },
+ {
+  "folder": "[Mandatory] Registrations",
+  "name": "Get Detail Registration",
+  "method": "GET",
+  "url": "/api/registrations/{{registrationId}}",
+  "auth_hdr": [],
+  "body": "",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body have correct property and value', () => {\n    const responseJson = pm.response.json();\n\n    pm.expect(responseJson).to.have.property('ticket').to.be.an('string')\n    pm.expect(responseJson).to.have.property('user').to.be.an('string')\n});"
+ },
+ {
+  "folder": "[Mandatory] Registrations",
+  "name": "[Admin/Superuser] Edit Registrations with Valid Data",
+  "method": "PUT",
+  "url": "/api/registrations/{{registrationId}}/",
+  "auth_hdr": [],
+  "body": "{\n    \"ticket_id\": \"{{ticketId}}\",\n    \"user_id\": \"{{userId}}\"\n}",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('when GET registrations details after update', () => {\n    const registrationId = pm.environment.get('registrationId');\n    const host = pm.environment.get('host');\n    const port = pm.environment.get('port');\n\n    pm.sendRequest(`http://${host}:${port}/api/registrations/${registrationId}/`, (error, response) => {\n        if (!error) {\n            pm.test('it should response with revised content', () => {\n                pm.expect(response.code).to.equal(200);\n\n                const responseJson = response.json();\n\n                pm.expect(responseJson).to.be.an('object');\n                pm.expect(responseJson.id).to.equal(registrationId);\n            });\n        }\n    });\n});"
+ },
+ {
+  "folder": "[Mandatory] Registrations",
+  "name": "[Admin/Superuser] Delete Registrations",
+  "method": "DELETE",
+  "url": "/api/registrations/{{registrationId}}/",
+  "auth_hdr": [],
+  "body": "",
+  "tests": "pm.test('it should response 204 status code', () => {\n    pm.expect(pm.response).to.have.status(204);\n});\n\npm.test('when GET registration details after delete', () => {\n    const registrationId = pm.environment.get('registrationId');\n\n    pm.sendRequest(`http://{{host}}:{{port}}/api/registrations/${registrationId}`, (error, response) => {\n        if (!error) {\n            pm.test('it should response with 404 status code', () => {\n                pm.expect(response.code).to.equal(404);\n            });\n        }\n    });\n});\n"
+ },
+ {
+  "folder": "[No test] Prerequisite",
+  "name": "Add New Events",
+  "method": "POST",
+  "url": "/api/events/",
+  "auth_hdr": [],
+  "body": "{\n    \"name\": \"DevCoach 197: Back-End Python | REST API HARUS PAKAI HATEOAS? Ini Jawabannya!\",\n    \"description\": \"Dalam sesi ini, kalian akan belajar membuat web service pakai Django dari nol! Kita bahas tools, package manager, struktur Django, hingga RESTful API dengan Django REST Framework. Cocok banget buat kalian yang mau jadi back-end developer berbasis Python.\",\n    \"location\": \"Online\",\n    \"start_time\": \"2025-06-04 16:00\",\n    \"end_time\": \"2025-06-04 17:00\",\n    \"status\": \"scheduled\",\n    \"quota\": 200,\n    \"category\": \"Seminar\",\n    \"organizer_id\": \"{{userId}}\"\n}",
+  "tests": "const responseJson = pm.response.json();\npm.environment.set('eventId', responseJson.id);"
+ },
+ {
+  "folder": "[No test] Prerequisite",
+  "name": "Add New Tickets",
+  "method": "POST",
+  "url": "/api/tickets/",
+  "auth_hdr": [],
+  "body": "{\n    \"event_id\": \"{{eventId}}\",\n    \"name\": \"VIP\",\n    \"price\": 200000,\n    \"sales_start\": \"2025-06-04 16:00\",\n    \"sales_end\": \"2025-06-12 16:00\",\n    \"quota\": 200\n}",
+  "tests": "const responseJson = pm.response.json();\npm.environment.set('ticketId', responseJson.id);"
+ },
+ {
+  "folder": "[No test] Prerequisite",
+  "name": "Add New Registrations",
+  "method": "POST",
+  "url": "/api/registrations/",
+  "auth_hdr": [],
+  "body": "{\n    \"ticket_id\": \"{{ticketId}}\",\n    \"user_id\": \"{{userId}}\"\n}",
+  "tests": "const responseJson = pm.response.json();\npm.environment.set('registrationId', responseJson.id);"
+ },
+ {
+  "folder": "[Mandatory] Payments",
+  "name": "Add New Payments with Valid Data",
+  "method": "POST",
+  "url": "/api/payments/",
+  "auth_hdr": [],
+  "body": "{\n    \"registration_id\": \"{{registrationId}}\",\n    \"payment_method\": \"QRIS\",\n    \"payment_status\": \"pending\",\n    \"amount_paid\": 200000\n}",
+  "tests": "pm.test('it should response 201 status code', () => {\n    pm.expect(pm.response).to.have.status(201);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body should have correct property types and non-empty ID', () => {\n    const responseJson = pm.response.json();\n    \n    pm.expect(responseJson).to.have.property('id').that.is.a('string').and.is.not.empty;\n    pm.expect(responseJson).to.have.property('registration').that.is.a('string');\n    pm.expect(responseJson).to.have.property('payment_method').that.is.a('string');\n    pm.expect(responseJson).to.have.property('payment_status').that.is.a('string');\n    pm.expect(responseJson).to.have.property('amount_paid').that.is.a('number');\n\n\n    pm.environment.set('paymentId', responseJson.id);\n});\n"
+ },
+ {
+  "folder": "[Mandatory] Payments",
+  "name": "[Admin/Superuser] Get All Payments",
+  "method": "GET",
+  "url": "/api/payments/",
+  "auth_hdr": [],
+  "body": "",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body have correct property and value', () => {\n    const responseJson = pm.response.json();\n\n    pm.expect(responseJson.payments).to.be.an('array');\n    pm.expect(responseJson.payments).to.length.least(1);\n});"
+ },
+ {
+  "folder": "[Mandatory] Payments",
+  "name": "Get Detail Payment",
+  "method": "GET",
+  "url": "/api/payments/{{paymentId}}",
+  "auth_hdr": [],
+  "body": "",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body have correct property and value', () => {\n    const responseJson = pm.response.json();\n\n    pm.expect(responseJson).to.have.property('registration').to.be.an('string')\n    pm.expect(responseJson).to.have.property('payment_method').to.be.an('string')\n    pm.expect(responseJson).to.have.property('payment_status').to.be.an('string')\n    pm.expect(responseJson).to.have.property('amount_paid').to.be.an('number')\n});"
+ },
+ {
+  "folder": "[Mandatory] Payments",
+  "name": "[Admin/Superuser] Edit Payments with Valid Data",
+  "method": "PUT",
+  "url": "/api/payments/{{paymentId}}/",
+  "auth_hdr": [],
+  "body": "{\n    \"registration_id\": \"{{registrationId}}\",\n    \"payment_method\": \"QRIS\",\n    \"payment_status\": \"completed\",\n    \"amount_paid\": 200000\n}",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('when GET payment details after update', () => {\n    const paymentId = pm.environment.get('paymentId');\n    const host = pm.environment.get('host');\n    const port = pm.environment.get('port');\n\n    pm.sendRequest(`http://${host}:${port}/api/payments/${paymentId}/`, (error, response) => {\n        if (!error) {\n            pm.test('it should response with revised content', () => {\n                pm.expect(response.code).to.equal(200);\n\n                const responseJson = response.json();\n\n                pm.expect(responseJson).to.be.an('object');\n                pm.expect(responseJson.id).to.equal(paymentId);\n                pm.expect(responseJson.payment_status).to.equal(\"Completed\");\n            });\n        }\n    });\n});"
+ },
+ {
+  "folder": "[Mandatory] Payments",
+  "name": "[Admin/Superuser] Delete Payments",
+  "method": "DELETE",
+  "url": "/api/payments/{{paymentId}}/",
+  "auth_hdr": [],
+  "body": "",
+  "tests": "pm.test('it should response 204 status code', () => {\n    pm.expect(pm.response).to.have.status(204);\n});\n\npm.test('when GET payment details after delete', () => {\n    const paymentId = pm.environment.get('paymentId');\n\n    pm.sendRequest(`http://{{host}}:{{port}}/api/payments/${paymentId}`, (error, response) => {\n        if (!error) {\n            pm.test('it should response with 404 status code', () => {\n                pm.expect(response.code).to.equal(404);\n            });\n        }\n    });\n});\n"
+ },
+ {
+  "folder": "[Optional] Events",
+  "name": "Get All Events with Pagination",
+  "method": "GET",
+  "url": "/api/events/?page=1",
+  "auth_hdr": [],
+  "body": "",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body have correct property and value', () => {\n    const responseJson = pm.response.json();\n\n    pm.expect(responseJson.events).to.be.an('array');\n    pm.expect(responseJson.events).to.length.least(1);\n});"
+ },
+ {
+  "folder": "[Optional] Organizer",
+  "name": "[Superuser] Add New Groups",
+  "method": "POST",
+  "url": "/api/groups/",
+  "auth_hdr": [],
+  "body": "{\n    \"name\": \"organizer\"\n}",
+  "tests": "const responseJson = pm.response.json();\npm.environment.set('groupId', responseJson.id);"
+ },
+ {
+  "folder": "[Optional] Organizer",
+  "name": "Add Organizer Dicoding",
+  "method": "POST",
+  "url": "/api/users/",
+  "auth_hdr": [],
+  "body": "{\n    \"username\": \"eo_dicoding\",\n    \"password\": \"{{password}}\",\n    \"email\": \"eo_dicoding@dicoding.com\"\n}",
+  "tests": "const responseJson = pm.response.json();\npm.environment.set('organizerDicodingId', responseJson.id);"
+ },
+ {
+  "folder": "[Optional] Organizer",
+  "name": "Add Other Organizer",
+  "method": "POST",
+  "url": "/api/users/",
+  "auth_hdr": [],
+  "body": "{\n    \"username\": \"other_organizer\",\n    \"password\": \"{{password}}\",\n    \"email\": \"other_organizer@others.com\"\n}",
+  "tests": "const responseJson = pm.response.json();\npm.environment.set('otherOrganizerId', responseJson.id);"
+ },
+ {
+  "folder": "[Optional] Organizer",
+  "name": "[Superuser] Assign Organizer Dicoding to Role Organizer",
+  "method": "POST",
+  "url": "/api/assign-roles/",
+  "auth_hdr": [],
+  "body": "{\n    \"user_id\": \"{{organizerDicodingId}}\",\n    \"group_id\": \"{{groupId}}\"\n}",
+  "tests": ""
+ },
+ {
+  "folder": "[Optional] Organizer",
+  "name": "[Superuser] Assign Other Organizer to Role Organizer",
+  "method": "POST",
+  "url": "/api/assign-roles/",
+  "auth_hdr": [],
+  "body": "{\n    \"user_id\": \"{{otherOrganizerId}}\",\n    \"group_id\": \"{{groupId}}\"\n}",
+  "tests": ""
+ },
+ {
+  "folder": "[Optional] Organizer",
+  "name": "Log In As a Organizer Dicoding",
+  "method": "POST",
+  "url": "/api/login/",
+  "auth_hdr": [],
+  "body": "{\n    \"username\": \"eo_dicoding\",\n    \"password\": \"{{password}}\"\n}",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body should contain refresh and access tokens', () => {\n    const responseJson = pm.response.json();\n    \n    pm.expect(responseJson).to.have.property('refresh').that.is.a('string').and.is.not.empty;\n    pm.expect(responseJson).to.have.property('access').that.is.a('string').and.is.not.empty;\n\n    pm.environment.set('refreshTokenOrganizerDicoding', responseJson.refresh);\n    pm.environment.set('accessTokenOrganizerDicoding', responseJson.access);\n});"
+ },
+ {
+  "folder": "[Optional] Organizer",
+  "name": "Log In As a Other Organizer",
+  "method": "POST",
+  "url": "/api/login/",
+  "auth_hdr": [],
+  "body": "{\n    \"username\": \"other_organizer\",\n    \"password\": \"{{password}}\"\n}",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body should contain refresh and access tokens', () => {\n    const responseJson = pm.response.json();\n    \n    pm.expect(responseJson).to.have.property('refresh').that.is.a('string').and.is.not.empty;\n    pm.expect(responseJson).to.have.property('access').that.is.a('string').and.is.not.empty;\n\n    pm.environment.set('refreshTokenOtherOrganizer', responseJson.refresh);\n    pm.environment.set('accessTokenOtherOrganizer', responseJson.access);\n});"
+ },
+ {
+  "folder": "[Optional] Organizer",
+  "name": "[Organizer] Add Own Event with Valid Data",
+  "method": "POST",
+  "url": "/api/events/",
+  "auth_hdr": [],
+  "body": "{\n    \"name\": \"DevCoach 197: Back-End Python | REST API HARUS PAKAI HATEOAS? Ini Jawabannya!\",\n    \"description\": \"Dalam sesi ini, kalian akan belajar membuat web service pakai Django dari nol! Kita bahas tools, package manager, struktur Django, hingga RESTful API dengan Django REST Framework. Cocok banget buat kalian yang mau jadi back-end developer berbasis Python.\",\n    \"location\": \"Online\",\n    \"start_time\": \"2025-06-04 16:00\",\n    \"end_time\": \"2025-06-04 17:00\",\n    \"status\": \"scheduled\",\n    \"quota\": 200,\n    \"category\": \"Seminar\",\n    \"organizer_id\": \"{{organizerDicodingId}}\"\n}",
+  "tests": "pm.test('it should response 201 status code', () => {\n    pm.expect(pm.response).to.have.status(201);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body should have correct property types and non-empty ID', () => {\n    const responseJson = pm.response.json();\n    \n    pm.expect(responseJson).to.have.property('id').that.is.a('string').and.is.not.empty;\n    pm.expect(responseJson).to.have.property('name').that.is.a('string');\n    pm.expect(responseJson).to.have.property('description').that.is.a('string');\n    pm.expect(responseJson).to.have.property('location').that.is.a('string');\n    pm.expect(responseJson).to.have.property('start_time').that.is.a('string');\n    pm.expect(responseJson).to.have.property('end_time').that.is.a('string');\n    pm.expect(responseJson).to.have.property('status').that.is.a('string');\n    pm.expect(responseJson).to.have.property('category').that.is.a('string');\n    pm.expect(responseJson).to.have.property('quota').that.is.a('number');\n\n    pm.environment.set('ownEventId', responseJson.id);\n});\n"
+ },
+ {
+  "folder": "[Optional] Organizer",
+  "name": "[Organizer] Add Other Event with Valid Data",
+  "method": "POST",
+  "url": "/api/events/",
+  "auth_hdr": [],
+  "body": "{\n    \"name\": \"DevCoach 197: Back-End Python | REST API HARUS PAKAI HATEOAS? Ini Jawabannya!\",\n    \"description\": \"Dalam sesi ini, kalian akan belajar membuat web service pakai Django dari nol! Kita bahas tools, package manager, struktur Django, hingga RESTful API dengan Django REST Framework. Cocok banget buat kalian yang mau jadi back-end developer berbasis Python.\",\n    \"location\": \"Online\",\n    \"start_time\": \"2025-06-04 16:00\",\n    \"end_time\": \"2025-06-04 17:00\",\n    \"status\": \"scheduled\",\n    \"quota\": 200,\n    \"category\": \"Seminar\",\n    \"organizer_id\": \"{{otherOrganizerId}}\"\n}",
+  "tests": "pm.test('it should response 201 status code', () => {\n    pm.expect(pm.response).to.have.status(201);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('response body should have correct property types and non-empty ID', () => {\n    const responseJson = pm.response.json();\n    \n    pm.expect(responseJson).to.have.property('id').that.is.a('string').and.is.not.empty;\n    pm.expect(responseJson).to.have.property('name').that.is.a('string');\n    pm.expect(responseJson).to.have.property('description').that.is.a('string');\n    pm.expect(responseJson).to.have.property('location').that.is.a('string');\n    pm.expect(responseJson).to.have.property('start_time').that.is.a('string');\n    pm.expect(responseJson).to.have.property('end_time').that.is.a('string');\n    pm.expect(responseJson).to.have.property('status').that.is.a('string');\n    pm.expect(responseJson).to.have.property('category').that.is.a('string');\n    pm.expect(responseJson).to.have.property('quota').that.is.a('number');\n\n    pm.environment.set('otherEventId', responseJson.id);\n});\n"
+ },
+ {
+  "folder": "[Optional] Organizer",
+  "name": "[Organizer] Edit Own Event",
+  "method": "PUT",
+  "url": "/api/events/{{ownEventId}}/",
+  "auth_hdr": [],
+  "body": "{\n    \"name\": \"DevCoach 197: Back-End Python | REST API HARUS PAKAI HATEOAS? Ini Jawabannya!\",\n    \"description\": \"Dalam sesi ini, kalian akan belajar membuat web service pakai Django dari nol! Kita bahas tools, package manager, struktur Django, hingga RESTful API dengan Django REST Framework. Cocok banget buat kalian yang mau jadi back-end developer berbasis Python.\",\n    \"location\": \"Online\",\n    \"start_time\": \"2025-06-04 16:00\",\n    \"end_time\": \"2025-06-04 17:00\",\n    \"status\": \"scheduled\",\n    \"quota\": 250,\n    \"category\": \"Seminar\",\n    \"organizer_id\": \"{{organizerDicodingId}}\"\n}",
+  "tests": "pm.test('it should response 200 status code', () => {\n    pm.expect(pm.response).to.have.status(200);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n}); \n\npm.test('response body should be an object', () => {\n    const responseJson = pm.response.json();\n    pm.expect(responseJson).to.be.an('object');\n});\n\npm.test('when GET event details after update', () => {\n    const eventId = pm.environment.get('ownEventId');\n    const host = pm.environment.get('host');\n    const port = pm.environment.get('port');\n\n    pm.sendRequest(`http://${host}:${port}/api/events/${eventId}/`, (error, response) => {\n        if (!error) {\n            pm.test('it should response with revised content', () => {\n                pm.expect(response.code).to.equal(200);\n\n                const responseJson = response.json();\n\n                pm.expect(responseJson).to.be.an('object');\n                pm.expect(responseJson.id).to.equal(eventId);\n                pm.expect(responseJson.quota).to.equal(250);\n            });\n        }\n    });\n});"
+ },
+ {
+  "folder": "[Optional] Organizer",
+  "name": "[Organizer] Try Edit Someone Else's Event",
+  "method": "PUT",
+  "url": "/api/events/{{otherEventId}}/",
+  "auth_hdr": [],
+  "body": "{\n    \"name\": \"DevCoach 197: Back-End Python | REST API HARUS PAKAI HATEOAS? Ini Jawabannya!\",\n    \"description\": \"Dalam sesi ini, kalian akan belajar membuat web service pakai Django dari nol! Kita bahas tools, package manager, struktur Django, hingga RESTful API dengan Django REST Framework. Cocok banget buat kalian yang mau jadi back-end developer berbasis Python.\",\n    \"location\": \"Online\",\n    \"start_time\": \"2025-06-04 16:00\",\n    \"end_time\": \"2025-06-04 17:00\",\n    \"status\": \"scheduled\",\n    \"quota\": 250,\n    \"category\": \"Seminar\",\n    \"organizer_id\": \"{{otherOrganizerId}}\"\n}",
+  "tests": "pm.test('it should response 403 status code', () => {\n    pm.expect(pm.response).to.have.status(403);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n});"
+ },
+ {
+  "folder": "[Optional] Organizer",
+  "name": "[Organizer] Delete Own Event",
+  "method": "DELETE",
+  "url": "/api/events/{{ownEventId}}/",
+  "auth_hdr": [],
+  "body": "",
+  "tests": "pm.test('it should response 204 status code', () => {\n    pm.expect(pm.response).to.have.status(204);\n});\n\npm.test('when GET event details after delete', () => {\n    const eventId = pm.environment.get('ownEventId');\n\n    pm.sendRequest(`http://{{host}}:{{port}}/api/movies/${eventId}`, (error, response) => {\n        if (!error) {\n            pm.test('it should response with 404 status code', () => {\n                pm.expect(response.code).to.equal(404);\n            });\n        }\n    });\n});\n"
+ },
+ {
+  "folder": "[Optional] Organizer",
+  "name": "[Organizer] Try Delete Someone Else's Event",
+  "method": "DELETE",
+  "url": "/api/events/{{otherEventId}}/",
+  "auth_hdr": [],
+  "body": "",
+  "tests": "pm.test('it should response 403 status code', () => {\n    pm.expect(pm.response).to.have.status(403);\n});\n\npm.test('response Content-Type header should have application/json value', () => {\n    pm.expect(pm.response.headers.get('Content-Type')).to.includes('application/json');\n});"
+ },
+ {
+  "folder": "[No test] Cleaning resources",
+  "name": "[Superuser] Delete Groups",
+  "method": "DELETE",
+  "url": "/api/groups/{{groupId}}/",
+  "auth_hdr": [],
+  "body": "",
+  "tests": ""
+ }
+]

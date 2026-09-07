@@ -1,0 +1,47 @@
+name: Continuous Deployment
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    name: Deploy to Production Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Deployment dilakukan melalui SSH ke server produksi.
+      # Seluruh nilai sensitif disimpan sebagai repository secrets,
+      # bukan dituliskan langsung pada berkas workflow.
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            set -e
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+            cd ~/forum-api
+
+            # Mengambil kode terbaru dari branch utama.
+            git fetch origin master
+            git reset --hard origin/master
+
+            # Memasang dependensi sesuai package-lock.json.
+            npm ci --omit=dev
+
+            # Menjalankan migrasi basis data produksi.
+            npm run migrate up
+
+            # Memuat ulang aplikasi tanpa waktu henti.
+            # Bila proses belum terdaftar, aplikasi dijalankan pertama kali.
+            pm2 reload forum-api --update-env || pm2 start src/app.js --name forum-api
+            pm2 save
