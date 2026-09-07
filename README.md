@@ -1,7 +1,7 @@
 # Back-End Engineering Portfolio Showcase
 
 Repositori ini merupakan showcase terpadu dan monorepo portofolio untuk seluruh submission proyek pada **Dicoding Back-End Developer Learning Path**, yang mencakup dua spesialisasi utama industri:
-1. **Track JavaScript / Node.js Back-End Developer**
+1. **Track JavaScript / Node.js Back-End Developer (dengan AWS Cloud)**
 2. **Track Python Back-End Developer & Google Cloud Platform (GCP)**
 
 ---
@@ -16,10 +16,12 @@ Repositori ini merupakan showcase terpadu dan monorepo portofolio untuk seluruh 
   * **Relational DB**: PostgreSQL, MySQL, Cloud SQL.
   * **Cache & Memory Store**: Redis (Cache-aside pattern, invalidation, TTL).
   * **Message Broker & Asynchronous Tasks**: RabbitMQ (AMQP), Celery, Redis Broker.
-* **Cloud Infrastructure (Google Cloud Platform - GCP)**:
-  * **Compute**: Google Compute Engine (GCE - IaaS Virtual Machine & Startup Script), Google App Engine (GAE - PaaS), Google Kubernetes Engine (GKE - Managed K8s).
-  * **Storage**: Google Cloud Storage (GCS - Object Storage, public bucket, signed URL), MinIO S3-compatible storage.
-  * **Networking & Resilience**: Cloud Load Balancing, Managed Instance Groups (MIG), Custom Mode VPC, Network Firewall Rules, Cloud Monitoring Dashboards.
+* **Cloud & Infrastructure**:
+  * **Amazon Web Services (AWS)**: EC2 (Ubuntu 22.04 LTS), Elastic IP, EBS, Security Groups, SSH Key Pair, PM2 Process Manager, automated Continuous Deployment via GitHub Actions (`appleboy/ssh-action`).
+  * **Google Cloud Platform (GCP)**:
+    * **Compute**: Google Compute Engine (GCE - IaaS Virtual Machine & Startup Script), Google App Engine (GAE - PaaS), Google Kubernetes Engine (GKE - Managed K8s).
+    * **Storage**: Google Cloud Storage (GCS - Object Storage, public bucket, signed URL), MinIO S3-compatible storage.
+    * **Networking & Resilience**: Cloud Load Balancing, Managed Instance Groups (MIG), Custom Mode VPC, Network Firewall Rules, Cloud Monitoring Dashboards.
 
 ---
 
@@ -37,7 +39,7 @@ back-end-engineering/
 │   │   ├── openjob-api/                    # REST API, PostgreSQL, Redis Caching, RabbitMQ Producer, Multer
 │   │   └── openjob-consumer/               # Asynchronous Consumer, Nodemailer, Worker Service
 │   └── d-expert-forum-api/                 # Menjadi Back-End Developer Expert dengan JavaScript
-│       └── (Clean Architecture, DDD, TDD / Vitest 100% Coverage, CI/CD, Nginx Hardening)
+│       └── (Clean Architecture, DDD, TDD 100% Coverage, CI/CD ke AWS EC2, Nginx Rate Limiting)
 │
 └── 02-backend-python-gcp/
     ├── a-cloud-engineer-profile-app/       # Belajar Membuat Aplikasi Back-End Pemula dengan Google Cloud
@@ -66,7 +68,7 @@ back-end-engineering/
 | **`a-pemula-bookshelf-api`** | Belajar Back-End Pemula dengan JavaScript | Hapi.js, Node.js | Validasi payload JSON, full CRUD buku, query parameters filtering (name, reading, finished), lolos 100% tes otomasi Postman. |
 | **`b-nodejs-developer-labs`** | Menjadi Node.js Application Developer | Node.js Core, Inspect CDP, V8 | Diagnostic breakpoint, inspect mode, ESM/CJS module interoperability, custom EventEmitter, dynamic error handling, concurrent Promise resolution. |
 | **`c-fundamental-openjob-api`** | Belajar Fundamental Back-End dengan JavaScript | Node.js, Express, PostgreSQL, Redis, RabbitMQ | Otentikasi JWT (access & refresh token), upload berkas PDF ke storage lokal, server-side caching Redis 1 jam dengan header `X-Data-Source`, asynchronous message broker RabbitMQ dengan worker consumer pengirim email. |
-| **`d-expert-forum-api`** | Menjadi Back-End Developer Expert dengan JavaScript | Node.js, Hapi, PostgreSQL, Vitest, Nginx | Implementasi **Clean Architecture** (Entities, Domain, Use Cases, Interfaces, Frameworks/Infrastructures). Dependency Injection container, TDD dengan 100% coverage, automated CI/CD pipeline, SSL & Rate Limiting reverse proxy. |
+| **`d-expert-forum-api`** | Menjadi Back-End Developer Expert dengan JavaScript | Node.js, Hapi/Express, PostgreSQL, Vitest, Nginx, AWS EC2, PM2, GitHub Actions | Implementasi **Clean Architecture** (Entities, Domain, Use Cases, Interfaces, Frameworks/Infrastructures). Dependency Injection container, TDD dengan 100% coverage, automated CI/CD pipeline ke **AWS EC2**, reverse proxy Nginx hardening (Rate Limiting `/threads` 90r/m & HTTPS Let's Encrypt), PM2 zero-downtime reload. |
 
 ---
 
