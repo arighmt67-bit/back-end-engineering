@@ -1,0 +1,22 @@
+{
+  "name": "asclepius-backend",
+  "version": "1.0.0",
+  "description": "Skin Cancer Classification API with Google Cloud",
+  "main": "src/server/server.js",
+  "scripts": {
+    "start": "node src/server/server.js",
+    "dev": "nodemon src/server/server.js"
+  },
+  "dependencies": {
+    "@google-cloud/firestore": "^7.11.0",
+    "@hapi/hapi": "^21.3.12",
+    "@tensorflow/tfjs": "^4.22.0",
+    "dotenv": "^16.4.7",
+    "jpeg-js": "^0.4.4",
+    "pngjs": "^7.0.0",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
