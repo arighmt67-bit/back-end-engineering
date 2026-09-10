@@ -1,15 +1,17 @@
 # Back-End Engineering Portfolio Showcase
 
-Repositori ini merupakan showcase terpadu dan monorepo portofolio untuk seluruh submission proyek pada **Dicoding Back-End Developer & Cloud AI Learning Path**, yang mencakup tiga spesialisasi utama industri:
+Repositori ini merupakan showcase terpadu dan monorepo portofolio untuk seluruh submission proyek pada **Dicoding Back-End Developer, Cloud Computing & Systems Learning Path**, yang mencakup empat spesialisasi utama industri:
 1. **Track JavaScript / Node.js Back-End Developer (dengan AWS Cloud)**
 2. **Track Python Back-End Developer & Google Cloud Platform (GCP)**
 3. **Track Machine Learning Deployment di Google Cloud Platform (GCP & TensorFlow.js)**
+4. **Track Systems Programming & CLI Development dengan Rust**
 
 ---
 
 ## 🧰 Ringkasan Bahasa & Cloud Provider yang Digunakan
 
 * **Bahasa Pemrograman & Frameworks**:
+  * **Rust**: Rust 2021 Edition, CLI Parsing via `clap` (Derive feature), Serialization via `serde` & `serde_json`, Native Memory Safety, Zero-Cost Abstractions.
   * **JavaScript (Node.js)**: ES6+, CommonJS, Native Asynchronous / Event-Loop, Hapi.js Framework, Express.js.
   * **Machine Learning Runtime**: TensorFlow.js (`@tensorflow/tfjs`), MobileNetV3 Graph Model inference.
   * **Python**: Python 3.11+, Django REST Framework (DRF), ASGI/WSGI.
@@ -19,6 +21,7 @@ Repositori ini merupakan showcase terpadu dan monorepo portofolio untuk seluruh 
   * **Relational DB**: PostgreSQL, MySQL, Cloud SQL.
   * **Cache & Memory Store**: Redis (Cache-aside pattern, invalidation, TTL).
   * **Message Broker & Asynchronous Tasks**: RabbitMQ (AMQP), Celery, Redis Broker.
+  * **Local File Storage & Persistence**: JSON File I/O (`conversion.json`).
 * **Cloud & Infrastructure**:
   * **Amazon Web Services (AWS)**: EC2 (Ubuntu 22.04 LTS), Elastic IP, EBS, Security Groups, SSH Key Pair, PM2 Process Manager, automated Continuous Deployment via GitHub Actions (`appleboy/ssh-action`).
   * **Google Cloud Platform (GCP)**:
@@ -61,12 +64,19 @@ back-end-engineering/
 │       ├── k8s/                            # Manifests K8s Deployment & LoadBalancer Service di GKE
 │       └── submission-arsitektur-andal/     # Managed Instance Group, VPC Custom, Load Balancer, Monitoring
 │
-└── 03-machine-learning-gcp/
-    └── asclepius/                          # Belajar Penerapan Machine Learning dengan Google Cloud (Bintang 5)
-        ├── backend/                        # Serverless Hapi.js API + TF.js on Cloud Run
-        ├── frontend/                       # Web UI on App Engine Standard F1 (Node.js 22)
-        ├── requirements.json               # Metadata Evaluasi Submission
-        └── README.md                       # Dokumentasi Lengkap Arsitektur & Newman Test
+├── 03-machine-learning-gcp/
+│   └── asclepius/                          # Belajar Penerapan Machine Learning dengan Google Cloud (Bintang 5)
+│       ├── backend/                        # Serverless Hapi.js API + TF.js on Cloud Run
+│       ├── frontend/                       # Web UI on App Engine Standard F1 (Node.js 22)
+│       ├── requirements.json               # Metadata Evaluasi Submission
+│       └── README.md                       # Dokumentasi Lengkap Arsitektur & Newman Test
+│
+└── 05-rust-systems/
+    └── unitconv/                           # Belajar Pemrograman Rust untuk Pemula (Bintang 5)
+        ├── Cargo.toml                      # Rust Manifest & Dependencies (clap, serde, serde_json)
+        ├── conversion.json                 # Local Persistent History File
+        ├── src/main.rs                     # Temperature & Length CLI Engine
+        └── README.md                       # Dokumentasi Perintah CLI & Pengujian
 ```
 
 ---
@@ -104,9 +114,17 @@ back-end-engineering/
 
 ---
 
+### Track 4: Systems Programming & CLI Development (Rust)
+
+| Sub-Modul | Course Dicoding | Tech Stack | Fitur & Arsitektur Utama (Bintang 5) |
+| :--- | :--- | :--- | :--- |
+| **`05-rust-systems/unitconv`** | Belajar Pemrograman Rust untuk Pemula | Rust 2021, Cargo, Clap v4, Serde, Serde JSON | **Target Evaluasi Bintang 5 (Advance)**:<br>• **Konversi Suhu & Panjang**: Mendukung `celsius`, `fahrenheit`, `kelvin`, `cm`, `inch`, `km`, dan `miles` dengan format angka presisi.<br>• **Subcommand List**: `unitconv list` menampilkan seluruh 7 satuan terkelompok kategori `[suhu]` dan `[panjang]`.<br>• **Ketahanan Data (Persistensi)**: Pencatatan riwayat otomatis ke berkas lokal `conversion.json` & audit riwayat via `unitconv history`.<br>• **Logika & Strict Error Handling**: Menolak satuan tak dikenal tanpa panic dan memblokir anomali konversi lintas kategori (`[panjang] cm → [suhu] celsius`). |
+
+---
+
 ## 👤 Author
 
 * **Nama**: Ari Rahmat Romadhon
 * **GitHub**: [@arighmt67-bit](https://github.com/arighmt67-bit)
 * **LinkedIn**: [Ari Rahmat Romadhon](https://www.linkedin.com/in/arirahmatr/)
-* **Platform**: Dicoding Indonesia - Back-End Developer & Cloud Computing Learning Paths
+* **Platform**: Dicoding Indonesia - Back-End Developer, Cloud Computing & Systems Learning Paths
