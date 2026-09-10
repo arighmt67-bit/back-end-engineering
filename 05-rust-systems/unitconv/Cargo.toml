@@ -1,0 +1,11 @@
+[package]
+name = "unitconv"
+version = "0.1.0"
+edition = "2021"
+authors = ["Ari Rahmat Romadhon <arirahmatromadhon@gmail.com>"]
+description = "A comprehensive CLI application for temperature and length unit conversion written in Rust"
+
+[dependencies]
+clap = { version = "4.5", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
