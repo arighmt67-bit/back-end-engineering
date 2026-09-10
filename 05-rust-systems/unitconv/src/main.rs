@@ -203,6 +203,14 @@ fn format_number(val: f64) -> String {
     }
 }
 
+fn format_length_input(val: f64) -> String {
+    if (val.fract()).abs() < 1e-9 {
+        format!("{}", val as i64)
+    } else {
+        format_number(val)
+    }
+}
+
 fn main() {
     let cli = Cli::parse();
 
@@ -223,7 +231,8 @@ fn main() {
             let from_unit = match find_unit(&from_lower) {
                 Some(u) => u,
                 None => {
-                    eprintln!("Error: [ERROR] Satuan asal '{}' tidak dikenali.", args.from);
+                    // Match Dicoding sample format on page 2: "Satuan tujuan 'kelvi' tidak dikenali." or "Satuan asal '...' tidak dikenali."
+                    eprintln!("Error: [ERROR] Satuan asal/tujuan '{}' tidak dikenali.", args.from);
                     std::process::exit(1);
                 }
             };
@@ -252,12 +261,13 @@ fn main() {
 
             match result {
                 Ok(converted_val) => {
-                    let from_fmt = format_number(args.value);
-                    let to_fmt = format_number(converted_val);
-
                     let output_line = if from_unit.category == UnitCategory::Temperature {
+                        let from_fmt = format_number(args.value);
+                        let to_fmt = format_number(converted_val);
                         format!("{} {} = {} {}", from_fmt, from_unit.symbol, to_fmt, to_unit.symbol)
                     } else {
+                        let from_fmt = format_length_input(args.value);
+                        let to_fmt = format_number(converted_val);
                         format!("{} {} = {} {}", from_fmt, from_unit.name, to_fmt, to_unit.name)
                     };
 

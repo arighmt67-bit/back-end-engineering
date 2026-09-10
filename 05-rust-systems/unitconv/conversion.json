@@ -1,0 +1,30 @@
+[
+  {
+    "from_value": 100.0,
+    "from_unit": "celsius",
+    "to_value": 212.0,
+    "to_unit": "fahrenheit",
+    "formatted": "100.0 °C = 212.0 °F"
+  },
+  {
+    "from_value": 273.15,
+    "from_unit": "kelvin",
+    "to_value": 0.0,
+    "to_unit": "celsius",
+    "formatted": "273.15 K = 0.0 °C"
+  },
+  {
+    "from_value": 16000.0,
+    "from_unit": "cm",
+    "to_value": 0.16,
+    "to_unit": "km",
+    "formatted": "16000 cm = 0.16 km"
+  },
+  {
+    "from_value": 100.0,
+    "from_unit": "cm",
+    "to_value": 39.37007874015748,
+    "to_unit": "inch",
+    "formatted": "100 cm = 39.370079 inch"
+  }
+]
