@@ -1,0 +1,30 @@
+# Panduan Menjalankan ETL Pipeline
+
+## 1. Menjalankan Skrip ETL Pipeline
+Pastikan virtual environment telah diaktifkan dan dependencies terpasang:
+```bash
+python3 main.py
+```
+
+## 2. Menjalankan Unit Test pada Folder tests
+```bash
+python3 -m pytest tests
+```
+
+## 3. Menjalankan Test Coverage pada Folder tests
+```bash
+coverage run -m pytest tests
+coverage report
+```
+Atau menggunakan pytest-cov:
+```bash
+pytest --cov=utils --cov-report=term-missing tests
+```
+
+## 4. Repositori Penyimpanan Data (Kriteria 2)
+Pipeline menyimpan data ke:
+1. Flat File: `products.csv`
+2. Database Relasional: PostgreSQL (`dicoding_pemda` - tabel `products`)
+3. Google Sheets (Opsional): Telah disediakan modul `load_to_google_sheets` dengan integrasi `google-sheets-api.json`.
+   Url Google Sheets:
+   - https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit?usp=sharing
