@@ -1,0 +1,77 @@
+name: Back-End Monorepo CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  node-lint:
+    name: Node.js Lint & Static Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: 01-backend-javascript/d-expert-forum-api/package-lock.json
+
+      - name: Audit & Lint Forum API (Expert)
+        working-directory: 01-backend-javascript/d-expert-forum-api
+        run: |
+          npm ci --ignore-scripts
+          npm run lint
+
+      - name: Audit & Lint Bookshelf API (Pemula)
+        working-directory: 01-backend-javascript/a-pemula-bookshelf-api
+        run: |
+          npm ci --ignore-scripts
+          npm run lint
+
+  python-test:
+    name: Python ETL Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: 02-backend-python-gcp/f-fundamental-pemrosesan-data-etl/requirements.txt
+
+      - name: Install Dependencies & Run Pytest
+        working-directory: 02-backend-python-gcp/f-fundamental-pemrosesan-data-etl
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pytest tests/ --cov=utils --cov-report=term-missing
+
+  rust-test:
+    name: Rust Systems Check & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: 05-rust-systems/unitconv
+
+      - name: Cargo Check & Test Unitconv
+        working-directory: 05-rust-systems/unitconv
+        run: |
+          cargo check --verbose
+          cargo test --verbose

@@ -1,5 +1,7 @@
 # Back-End Engineering Portfolio Showcase
 
+[![Back-End Monorepo CI](https://github.com/arighmt67-bit/back-end-engineering/actions/workflows/ci.yml/badge.svg)](https://github.com/arighmt67-bit/back-end-engineering/actions/workflows/ci.yml)
+
 Repositori ini merupakan showcase terpadu dan monorepo portofolio untuk seluruh submission proyek pada **Dicoding Back-End Developer, Cloud Computing & Systems Learning Path**, yang mencakup empat spesialisasi utama industri:
 1. **Track JavaScript / Node.js Back-End Developer (dengan AWS Cloud)**
 2. **Track Python Back-End Developer & Google Cloud Platform (GCP)**
