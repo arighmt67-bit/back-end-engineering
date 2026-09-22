@@ -73,6 +73,14 @@ back-end-engineering/
 │       ├── requirements.json               # Metadata Evaluasi Submission
 │       └── README.md                       # Dokumentasi Lengkap Arsitektur & Newman Test
 │
+├── 04-backend-java-spring/
+│   └── a-helpdesk-api/                     # REST API Ticketing dengan Spring Boot 3 + JWT
+│       ├── src/main/java/                  # Controller, Service, Repository, Security, Exception Handler
+│       ├── src/test/java/                  # 51 test: unit, MockMvc matriks 401/403/200, HTTP IT (Tomcat)
+│       ├── scripts/                        # Verifikator regresi: menyuntik ulang bug lama, build wajib gagal
+│       ├── pom.xml                         # JaCoCo coverage gate + Enforcer anti duplikat dependency
+│       └── README.md                       # Endpoint, cara run, contoh curl, catatan 401 vs 403
+│
 └── 05-rust-systems/
     └── unitconv/                           # Belajar Pemrograman Rust untuk Pemula (Bintang 5)
         ├── Cargo.toml                      # Rust Manifest & Dependencies (clap, serde, serde_json)
@@ -113,6 +121,14 @@ back-end-engineering/
 | Sub-Modul | Course Dicoding | Tech Stack / Cloud Services | Fitur & Arsitektur Utama (Bintang 5) |
 | :--- | :--- | :--- | :--- |
 | **`03-machine-learning-gcp/asclepius`** | Belajar Penerapan Machine Learning dengan Google Cloud | Node.js, Hapi.js, TensorFlow.js (MobileNetV3), Cloud Run, App Engine, GCS, Firestore Native | **Target Evaluasi Bintang 5**:<br>• **Serverless Backend (Cloud Run)**: Auto-scaling 0-2 instance, otomatis memenuhi kriteria Compute Engine & Static IP tanpa biaya sewa IP statis.<br>• **Decoupled Model Storage (GCS)**: Model di-load dinamis dari bucket `gs://submissionmlgc-arirahmatr-model`.<br>• **NoSQL Database (Firestore Native)**: Endpoint GET `/predict/histories` & logging riwayat prediksi ke collection `predictions`.<br>• **Security & Least Privilege**: Hak akses auditor eksternal dibatasi spesifik (*Viewer/Reader only*).<br>• **Newman Tested**: 100% lolos 15/15 assertions Postman resmi Dicoding (201, 400, 413, 200). |
+
+---
+
+### Track 5: Enterprise Back-End dengan Java & Spring Boot
+
+| Sub-Modul | Fokus | Tech Stack | Fitur & Arsitektur Utama |
+| :--- | :--- | :--- | :--- |
+| **`04-backend-java-spring/a-helpdesk-api`** | REST API Ticketing (latihan mandiri) | Java 17, Spring Boot 3.5.3, Spring Security, Spring Data JPA, JJWT 0.12.6, springdoc-openapi, H2/PostgreSQL, JUnit 5, JaCoCo | **Fokus pada kebenaran perilaku, bukan sekadar fitur**:<br>• **Autentikasi JWT Stateless**: BCrypt password hashing, `SessionCreationPolicy.STATELESS`, masa berlaku token ditulis sebagai `Duration` (`30m`) agar satuannya eksplisit.<br>• **Otorisasi Berlapis**: aturan path di `SecurityConfig` untuk kontrol kasar, verifikasi kepemilikan tiket di `TicketService` untuk kontrol halus.<br>• **Semantik 401 vs 403 yang Benar**: `RestAuthenticationEntryPoint` memastikan request anonim dibalas 401 ("ambil token baru"), bukan 403 ("jangan diulang").<br>• **51 Test, Coverage Garis 86%**: unit test, `MockMvc` matriks 401/403/200, dan integration test lewat Tomcat sungguhan untuk menguji ERROR dispatch yang tak terjangkau MockMvc.<br>• **Regression Guard Teruji**: `scripts/verify-regression-guards.sh` menyuntikkan ulang tiga bug lama dan membuktikan build **gagal** pada ketiganya; `maven-enforcer-plugin` menahan duplikasi dependency yang membuat test hijau tapi aplikasi gagal boot.<br>• **Dokumentasi Interaktif**: Swagger UI di `/swagger-ui.html` dengan skema Bearer auth. |
 
 ---
 
