@@ -2,11 +2,14 @@
 
 [![Back-End Monorepo CI](https://github.com/arighmt67-bit/back-end-engineering/actions/workflows/ci.yml/badge.svg)](https://github.com/arighmt67-bit/back-end-engineering/actions/workflows/ci.yml)
 
-Repositori ini merupakan showcase terpadu dan monorepo portofolio untuk seluruh submission proyek pada **Dicoding Back-End Developer, Cloud Computing & Systems Learning Path**, yang mencakup empat spesialisasi utama industri:
+Monorepo portofolio back-end: seluruh submission **Dicoding Back-End Developer, Cloud Computing & Systems Learning Path** ditambah latihan mandiri di luar kurikulum, mencakup lima spesialisasi:
 1. **Track JavaScript / Node.js Back-End Developer (dengan AWS Cloud)**
 2. **Track Python Back-End Developer & Google Cloud Platform (GCP)**
 3. **Track Machine Learning Deployment di Google Cloud Platform (GCP & TensorFlow.js)**
 4. **Track Systems Programming & CLI Development dengan Rust**
+5. **Track Enterprise Back-End dengan Java & Spring Boot** — latihan mandiri, bukan submission Dicoding
+
+Seluruh track divalidasi satu pipeline CI: lint Node.js, pytest, `mvn verify` + gerbang coverage JaCoCo, dan `cargo test`. Setiap perubahan masuk lewat Pull Request, bukan push langsung ke `main`.
 
 ---
 
@@ -16,6 +19,7 @@ Repositori ini merupakan showcase terpadu dan monorepo portofolio untuk seluruh 
   * **Rust**: Rust 2021 Edition, CLI Parsing via `clap` (Derive feature), Serialization via `serde` & `serde_json`, Native Memory Safety, Zero-Cost Abstractions.
   * **JavaScript (Node.js)**: ES6+, CommonJS, Native Asynchronous / Event-Loop, Hapi.js Framework, Express.js.
   * **Machine Learning Runtime**: TensorFlow.js (`@tensorflow/tfjs`), MobileNetV3 Graph Model inference.
+  * **Java**: Java 17, Spring Boot 3.5.3, Spring Security (JWT stateless), Spring Data JPA/Hibernate, Bean Validation, JUnit 5 + MockMvc, JaCoCo coverage gate, Maven Enforcer.
   * **Python**: Python 3.11+, Django REST Framework (DRF), ASGI/WSGI.
   * **PHP**: Digunakan pada modul arsitektur cloud App Engine (CodeIgniter MVC frontend).
 * **Database, Storage & Caching**:
@@ -124,7 +128,20 @@ back-end-engineering/
 
 ---
 
+
+### Track 4: Systems Programming & CLI Development (Rust)
+
+| Sub-Modul | Course Dicoding | Tech Stack | Fitur & Arsitektur Utama (Bintang 5) |
+| :--- | :--- | :--- | :--- |
+| **`05-rust-systems/unitconv`** | Belajar Pemrograman Rust untuk Pemula | Rust 2021, Cargo, Clap v4, Serde, Serde JSON | **Target Evaluasi Bintang 5 (Advance)**:<br>• **Konversi Suhu & Panjang**: Mendukung `celsius`, `fahrenheit`, `kelvin`, `cm`, `inch`, `km`, dan `miles` dengan format angka presisi.<br>• **Subcommand List**: `unitconv list` menampilkan seluruh 7 satuan terkelompok kategori `[suhu]` dan `[panjang]`.<br>• **Ketahanan Data (Persistensi)**: Pencatatan riwayat otomatis ke berkas lokal `conversion.json` & audit riwayat via `unitconv history`.<br>• **Logika & Strict Error Handling**: Menolak satuan tak dikenal tanpa panic dan memblokir anomali konversi lintas kategori (`[panjang] cm → [suhu] celsius`). |
+
+---
+
 ### Track 5: Enterprise Back-End dengan Java & Spring Boot
+
+> Latihan mandiri di luar kurikulum Dicoding. Dokumentasi lengkap (endpoint, contoh `curl`, catatan 401 vs 403): [`04-backend-java-spring/a-helpdesk-api/README.md`](04-backend-java-spring/a-helpdesk-api/README.md).
+>
+> Angka di bawah diambil dari artefak build nyata: **51 test hijau** (46 surefire + 5 failsafe/Tomcat IT), **line coverage 85,8%**, **branch coverage 70,5%** (`target/site/jacoco`).
 
 | Sub-Modul | Fokus | Tech Stack | Fitur & Arsitektur Utama |
 | :--- | :--- | :--- | :--- |
@@ -132,11 +149,18 @@ back-end-engineering/
 
 ---
 
-### Track 4: Systems Programming & CLI Development (Rust)
+## 🔁 Alur Kerja & Kualitas
 
-| Sub-Modul | Course Dicoding | Tech Stack | Fitur & Arsitektur Utama (Bintang 5) |
-| :--- | :--- | :--- | :--- |
-| **`05-rust-systems/unitconv`** | Belajar Pemrograman Rust untuk Pemula | Rust 2021, Cargo, Clap v4, Serde, Serde JSON | **Target Evaluasi Bintang 5 (Advance)**:<br>• **Konversi Suhu & Panjang**: Mendukung `celsius`, `fahrenheit`, `kelvin`, `cm`, `inch`, `km`, dan `miles` dengan format angka presisi.<br>• **Subcommand List**: `unitconv list` menampilkan seluruh 7 satuan terkelompok kategori `[suhu]` dan `[panjang]`.<br>• **Ketahanan Data (Persistensi)**: Pencatatan riwayat otomatis ke berkas lokal `conversion.json` & audit riwayat via `unitconv history`.<br>• **Logika & Strict Error Handling**: Menolak satuan tak dikenal tanpa panic dan memblokir anomali konversi lintas kategori (`[panjang] cm → [suhu] celsius`). |
+Semua perubahan masuk lewat **Pull Request ke `main`** (trunk-based, tanpa branch `dev`/`staging` permanen), dan wajib hijau di pipeline [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
+
+| Job CI | Cakupan | Yang Divalidasi |
+| :--- | :--- | :--- |
+| `node-lint` | `01-backend-javascript` | `npm audit`, ESLint Forum API (expert) & Bookshelf API (pemula) |
+| `python-test` | `02-backend-python-gcp` | Instalasi dependency + `pytest` |
+| `java-test` | `04-backend-java-spring` | `mvn verify` (unit + integration test Tomcat), gerbang coverage JaCoCo, artefak laporan coverage diunggah |
+| `rust-test` | `05-rust-systems` | `cargo check` + `cargo test` |
+
+Catatan jujur soal status saat ini: CI sudah berjalan dan lulus di setiap PR, tetapi **branch protection dan tag rilis (`v*.*.*`) belum dipasang** di repositori ini — keduanya jadi item perbaikan berikutnya.
 
 ---
 
