@@ -160,7 +160,13 @@ Semua perubahan masuk lewat **Pull Request ke `main`** (trunk-based, tanpa branc
 | `java-test` | `04-backend-java-spring` | `mvn verify` (unit + integration test Tomcat), gerbang coverage JaCoCo, artefak laporan coverage diunggah |
 | `rust-test` | `05-rust-systems` | `cargo check` + `cargo test` |
 
-Catatan jujur soal status saat ini: CI sudah berjalan dan lulus di setiap PR, tetapi **branch protection dan tag rilis (`v*.*.*`) belum dipasang** di repositori ini — keduanya jadi item perbaikan berikutnya.
+Branch `main` dilindungi, jadi keempat job di atas berstatus **gerbang, bukan sekadar laporan**:
+
+* Keempat status check wajib hijau sebelum merge; `strict: true` berarti branch harus rebase/update ke `main` terkini dulu.
+* `enforce_admins: true` — aturan ini berlaku untuk pemilik repositori juga. Push langsung ke `main` ditolak server dengan `GH006: protected branch hook declined`, bukan sekadar peringatan yang bisa di-bypass.
+* Force push dan penghapusan branch `main` dimatikan.
+
+Yang sengaja **tidak** dipakai di sini: tag rilis `v*.*.*`. Repositori ini monorepo latihan yang masih bertambah modul dan tidak punya konsumen artefak (tidak ada yang menarik paket atau JAR-nya), sehingga versi semantik tidak akan punya makna kontrak yang bisa dipertanggungjawabkan. Penandaan rilis baru relevan bila salah satu modul dipisah menjadi artefak yang benar-benar dikonsumsi.
 
 ---
 
