@@ -14,11 +14,11 @@ Kalau hanya ingin melihat beberapa proyek yang paling mewakili proses belajar sa
 
 Latihan mandiri terbaru saya untuk memahami apa yang terjadi ketika sebuah API mulai bergantung pada beberapa service. Aplikasi utamanya adalah REST API Spring Boot dengan JWT dan kontrol akses. PostgreSQL menyimpan data utama, Redis digunakan sebagai cache untuk pembacaan tiket, dan Kafka membawa event ke notification worker.
 
-Bagian yang paling banyak saya pelajari bukan CRUD-nya, melainkan cara menghadapi kegagalan: cache dibuat *fail-open*, perubahan tiket dan event dicatat melalui transactional outbox, lalu worker mencegah event yang sama diproses dua kali. Stack lengkapnya dapat dijalankan dengan Docker Compose dan diuji dengan skenario Redis maupun Kafka berhenti sementara.
+Bagian yang paling banyak saya pelajari bukan CRUD-nya, melainkan cara menghadapi kegagalan: cache dibuat *fail-open*, event pembuatan dan perubahan status tiket dicatat melalui transactional outbox, lalu worker mencegah event yang sama diproses dua kali. Stack lengkapnya dapat dijalankan dengan Docker Compose dan diuji dengan skenario Redis maupun Kafka berhenti sementara.
 
 - Java 17, Spring Boot, PostgreSQL, Redis, Kafka, Flyway
 - 73 test pada API dan 11 test pada worker
-- CI menjalankan build, coverage gate, validasi Compose, dan smoke test alur event
+- CI menjalankan build API dan worker, coverage gate API, validasi Compose, dan smoke test alur event
 - Dokumentasi: [Helpdesk Ticketing API](04-backend-java-spring/a-helpdesk-api/README.md)
 
 ### 2. [Forum API](01-backend-javascript/d-expert-forum-api)
@@ -39,15 +39,15 @@ REST API pengelolaan event yang dibuat dalam dua tahap. Versi pertama berfokus p
 Proyek ini membuat saya lebih memahami bahwa menambahkan layanan bukan sekadar menambah daftar teknologi. Cache membutuhkan strategi invalidasi, pekerjaan latar belakang membutuhkan worker yang dipantau, dan penyimpanan objek membawa aturan validasi serta konfigurasi baru.
 
 - Python, Django REST Framework, PostgreSQL
-- Redis, Celery, MinIO, dan log terstruktur pada versi kedua
+- Redis, Celery, MinIO, dan log berformat tetap dengan rotasi berkas pada versi kedua
 - Dokumentasi: [DicoEvent](02-backend-python-gcp/d-fundamental-python-dicoevent/README.md)
 
 ## Proyek lain di repo ini
 
 | Area | Proyek | Yang saya kerjakan |
 | --- | --- | --- |
-| JavaScript | [Bookshelf API](01-backend-javascript/a-pemula-bookshelf-api) | REST API buku dengan Hapi, validasi input, filter, dan pengujian Postman. |
-| JavaScript | [Node.js labs](01-backend-javascript/b-nodejs-developer-labs) | Latihan event loop, module system, promises, debugging, dan error handling. |
+| JavaScript | [Bookshelf API](01-backend-javascript/a-pemula-bookshelf-api) | REST API buku dengan Hapi, validasi input, filter, dan pernah diverifikasi menggunakan koleksi Postman Dicoding. |
+| JavaScript | [Node.js labs](01-backend-javascript/b-nodejs-developer-labs) | Latihan pemrograman asinkron, module system, promises, debugging, dan error handling. |
 | JavaScript | [OpenJob API & consumer](01-backend-javascript/c-fundamental-openjob-api) | PostgreSQL, Redis cache, upload PDF, RabbitMQ, dan worker pengirim email. |
 | Python | [OpenShop API](02-backend-python-gcp/b-pemula-python-openshop-api) | API katalog produk dengan Django REST Framework, filtering, dan test. |
 | Data | [ETL pipeline](02-backend-python-gcp/f-fundamental-pemrosesan-data-etl) | Extract, transform, dan load ke CSV, PostgreSQL, atau Google Sheets; setiap tahap diuji dengan pytest. |
@@ -77,7 +77,7 @@ Workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) berjalan pada pu
 | --- | --- |
 | `Node.js Lint & Static Checks` | ESLint pada Forum API dan Bookshelf API. |
 | `Python ETL Test Suite` | Test untuk tahap extract, transform, dan load pada proyek ETL. |
-| `Java Spring Boot Test & Coverage` | `mvn verify` untuk API dan worker, coverage gate, validasi Compose, serta smoke test termasuk simulasi gangguan Redis dan Kafka. |
+| `Java Spring Boot Test & Coverage` | `mvn verify` untuk API dan worker, coverage gate pada API, validasi Compose, serta smoke test termasuk simulasi gangguan Redis dan Kafka. |
 | `Rust Systems Check & Test` | `cargo check` dan `cargo test` untuk `unitconv`. |
 
 Branch `main` dilindungi oleh empat check tersebut. Perubahan dikirim melalui pull request, dan force push maupun penghapusan `main` dinonaktifkan.
