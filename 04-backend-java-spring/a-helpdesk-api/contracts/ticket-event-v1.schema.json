@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://helpdesk.local/contracts/ticket-event-v1.schema.json",
+  "title": "Helpdesk Ticket Event v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "eventId",
+    "eventType",
+    "eventVersion",
+    "ticketId",
+    "ownerEmail",
+    "status",
+    "occurredAt"
+  ],
+  "properties": {
+    "eventId": { "type": "string", "format": "uuid" },
+    "eventType": {
+      "type": "string",
+      "enum": ["ticket.created.v1", "ticket.status-changed.v1"]
+    },
+    "eventVersion": { "const": 1 },
+    "ticketId": { "type": "integer", "minimum": 1 },
+    "ownerEmail": { "type": "string", "format": "email" },
+    "status": {
+      "type": "string",
+      "enum": ["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"]
+    },
+    "occurredAt": { "type": "string", "format": "date-time" }
+  }
+}

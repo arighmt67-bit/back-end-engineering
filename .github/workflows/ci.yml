@@ -14,20 +14,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: npm
           cache-dependency-path: 01-backend-javascript/d-expert-forum-api/package-lock.json
-
       - name: Audit & Lint Forum API (Expert)
         working-directory: 01-backend-javascript/d-expert-forum-api
         run: |
           npm ci --ignore-scripts
           npm run lint
-
       - name: Audit & Lint Bookshelf API (Pemula)
         working-directory: 01-backend-javascript/a-pemula-bookshelf-api
         run: |
@@ -40,14 +37,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Setup Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: 'pip'
+          cache: pip
           cache-dependency-path: 02-backend-python-gcp/f-fundamental-pemrosesan-data-etl/requirements.txt
-
       - name: Install Dependencies & Run Pytest
         working-directory: 02-backend-python-gcp/f-fundamental-pemrosesan-data-etl
         run: |
@@ -58,27 +53,39 @@ jobs:
   java-test:
     name: Java Spring Boot Test & Coverage
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Setup JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'temurin'
-          cache: 'maven'
-
+          distribution: temurin
+          cache: maven
       - name: Build, Test & Coverage Gate (Helpdesk API)
         working-directory: 04-backend-java-spring/a-helpdesk-api
         run: ./mvnw -B --no-transfer-progress clean verify
-
-      - name: Upload JaCoCo Report
+      - name: Build & Test (Notification Worker)
+        working-directory: 04-backend-java-spring/b-notification-worker
+        run: ../a-helpdesk-api/mvnw -B --no-transfer-progress clean verify
+      - name: Validate Compose model
+        working-directory: 04-backend-java-spring
+        env:
+          JWT_SECRET: ci-compose-model-secret-minimum-32-characters
+        run: docker compose -f compose.yml config --quiet
+      - name: Smoke event pipeline and outage recovery
+        working-directory: 04-backend-java-spring
+        run: ./scripts/smoke-helpdesk-event-pipeline.sh
+      - name: Upload Java reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: helpdesk-api-jacoco-report
-          path: 04-backend-java-spring/a-helpdesk-api/target/site/jacoco/
+          name: java-event-pipeline-reports
+          path: |
+            04-backend-java-spring/a-helpdesk-api/target/site/jacoco/
+            04-backend-java-spring/b-notification-worker/target/surefire-reports/
+            /tmp/helpdesk-compose-failure.log
           if-no-files-found: warn
 
   rust-test:
@@ -87,15 +94,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
-
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: 05-rust-systems/unitconv
-
       - name: Cargo Check & Test Unitconv
         working-directory: 05-rust-systems/unitconv
         run: |

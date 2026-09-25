@@ -26,7 +26,7 @@ Seluruh track divalidasi satu pipeline CI: lint Node.js, pytest, `mvn verify` + 
   * **NoSQL Database**: Google Cloud Firestore (Native Mode, root collection `predictions`).
   * **Relational DB**: PostgreSQL, MySQL, Cloud SQL.
   * **Cache & Memory Store**: Redis (Cache-aside pattern, invalidation, TTL).
-  * **Message Broker & Asynchronous Tasks**: RabbitMQ (AMQP), Celery, Redis Broker.
+  * **Message Broker & Asynchronous Tasks**: Apache Kafka, transactional outbox, RabbitMQ (AMQP), Celery, Redis Broker.
   * **Local File Storage & Persistence**: JSON File I/O (`conversion.json`).
 * **Cloud & Infrastructure**:
   * **Amazon Web Services (AWS)**: EC2 (Ubuntu 22.04 LTS), Elastic IP, EBS, Security Groups, SSH Key Pair, PM2 Process Manager, automated Continuous Deployment via GitHub Actions (`appleboy/ssh-action`).
@@ -78,12 +78,10 @@ back-end-engineering/
 │       └── README.md                       # Dokumentasi Lengkap Arsitektur & Newman Test
 │
 ├── 04-backend-java-spring/
-│   └── a-helpdesk-api/                     # REST API Ticketing dengan Spring Boot 3 + JWT
-│       ├── src/main/java/                  # Controller, Service, Repository, Security, Exception Handler
-│       ├── src/test/java/                  # 51 test: unit, MockMvc matriks 401/403/200, HTTP IT (Tomcat)
-│       ├── scripts/                        # Verifikator regresi: menyuntik ulang bug lama, build wajib gagal
-│       ├── pom.xml                         # JaCoCo coverage gate + Enforcer anti duplikat dependency
-│       └── README.md                       # Endpoint, cara run, contoh curl, catatan 401 vs 403
+│   ├── a-helpdesk-api/                     # REST API, Redis cache, transactional outbox producer
+│   ├── b-notification-worker/              # Kafka consumer idempotent (unique event_id)
+│   ├── compose.yml                         # PostgreSQL, Redis, Kafka, API, worker
+│   └── scripts/                            # E2E smoke termasuk outage Redis/Kafka
 │
 └── 05-rust-systems/
     └── unitconv/                           # Belajar Pemrograman Rust untuk Pemula (Bintang 5)
@@ -141,11 +139,11 @@ back-end-engineering/
 
 > Latihan mandiri di luar kurikulum Dicoding. Dokumentasi lengkap (endpoint, contoh `curl`, catatan 401 vs 403): [`04-backend-java-spring/a-helpdesk-api/README.md`](04-backend-java-spring/a-helpdesk-api/README.md).
 >
-> Angka di bawah diambil dari artefak build nyata: **51 test hijau** (46 surefire + 5 failsafe/Tomcat IT), **line coverage 85,8%**, **branch coverage 70,5%** (`target/site/jacoco`).
+> Angka di bawah diambil dari artefak build nyata: **73 test API hijau** (66 unit + 7 integration), **11 test worker hijau**, **line coverage 89,9%**, **branch coverage 75,0%** (`target/site/jacoco`).
 
 | Sub-Modul | Fokus | Tech Stack | Fitur & Arsitektur Utama |
 | :--- | :--- | :--- | :--- |
-| **`04-backend-java-spring/a-helpdesk-api`** | REST API Ticketing (latihan mandiri) | Java 17, Spring Boot 3.5.3, Spring Security, Spring Data JPA, JJWT 0.12.6, springdoc-openapi, H2/PostgreSQL, JUnit 5, JaCoCo | **Fokus pada kebenaran perilaku, bukan sekadar fitur**:<br>• **Autentikasi JWT Stateless**: BCrypt password hashing, `SessionCreationPolicy.STATELESS`, masa berlaku token ditulis sebagai `Duration` (`30m`) agar satuannya eksplisit.<br>• **Otorisasi Berlapis**: aturan path di `SecurityConfig` untuk kontrol kasar, verifikasi kepemilikan tiket di `TicketService` untuk kontrol halus.<br>• **Semantik 401 vs 403 yang Benar**: `RestAuthenticationEntryPoint` memastikan request anonim dibalas 401 ("ambil token baru"), bukan 403 ("jangan diulang").<br>• **51 Test, Coverage Garis 86%**: unit test, `MockMvc` matriks 401/403/200, dan integration test lewat Tomcat sungguhan untuk menguji ERROR dispatch yang tak terjangkau MockMvc.<br>• **Regression Guard Teruji**: `scripts/verify-regression-guards.sh` menyuntikkan ulang tiga bug lama dan membuktikan build **gagal** pada ketiganya; `maven-enforcer-plugin` menahan duplikasi dependency yang membuat test hijau tapi aplikasi gagal boot.<br>• **Dokumentasi Interaktif**: Swagger UI di `/swagger-ui.html` dengan skema Bearer auth. |
+| **`04-backend-java-spring`** | Event-driven helpdesk (latihan mandiri) | Java 17, Spring Boot 3.5.3, PostgreSQL, Redis, Kafka, Flyway, Docker Compose | JWT/RBAC, cache-aside fail-open, transactional outbox at-least-once, worker idempotent via unique `event_id`, migration versioned, dan smoke outage Redis/Kafka. Bukti lokal: API 73/73, worker 11/11, coverage 89,9%/75,0%; runtime Compose juga digate di CI. |
 
 ---
 
@@ -157,7 +155,7 @@ Semua perubahan masuk lewat **Pull Request ke `main`** (trunk-based, tanpa branc
 | :--- | :--- | :--- |
 | `node-lint` | `01-backend-javascript` | `npm audit`, ESLint Forum API (expert) & Bookshelf API (pemula) |
 | `python-test` | `02-backend-python-gcp` | Instalasi dependency + `pytest` |
-| `java-test` | `04-backend-java-spring` | `mvn verify` (unit + integration test Tomcat), gerbang coverage JaCoCo, artefak laporan coverage diunggah |
+| `java-test` | `04-backend-java-spring` | API + worker `mvn verify`, JaCoCo, validasi Compose, dan E2E smoke termasuk outage Redis/Kafka |
 | `rust-test` | `05-rust-systems` | `cargo check` + `cargo test` |
 
 Branch `main` dilindungi, jadi keempat job di atas berstatus **gerbang, bukan sekadar laporan**:

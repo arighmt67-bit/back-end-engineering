@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +20,9 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     @Query("SELECT t FROM Ticket t JOIN FETCH t.owner WHERE t.id = :id")
     Optional<Ticket> findByIdWithOwner(@Param("id") Long id);
+
+    @Query("SELECT t.updatedAt FROM Ticket t WHERE t.id = :id")
+    Optional<Instant> findUpdatedAtById(@Param("id") Long id);
 
     @Query(value = "SELECT t FROM Ticket t JOIN FETCH t.owner o WHERE o.email = :email",
            countQuery = "SELECT COUNT(t) FROM Ticket t WHERE t.owner.email = :email")

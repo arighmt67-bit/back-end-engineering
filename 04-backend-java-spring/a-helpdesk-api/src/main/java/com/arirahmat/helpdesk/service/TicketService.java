@@ -1,5 +1,6 @@
 package com.arirahmat.helpdesk.service;
 
+import com.arirahmat.helpdesk.cache.TicketReadService;
 import com.arirahmat.helpdesk.dto.TicketRequest;
 import com.arirahmat.helpdesk.dto.TicketResponse;
 import com.arirahmat.helpdesk.entity.Role;
@@ -7,9 +8,13 @@ import com.arirahmat.helpdesk.entity.Ticket;
 import com.arirahmat.helpdesk.entity.TicketPriority;
 import com.arirahmat.helpdesk.entity.TicketStatus;
 import com.arirahmat.helpdesk.entity.User;
+import com.arirahmat.helpdesk.entity.TicketEventOutbox;
+import com.arirahmat.helpdesk.event.TicketEvent;
 import com.arirahmat.helpdesk.exception.ResourceNotFoundException;
+import com.arirahmat.helpdesk.repository.TicketEventOutboxRepository;
 import com.arirahmat.helpdesk.repository.TicketRepository;
 import com.arirahmat.helpdesk.repository.UserRepository;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -23,10 +28,18 @@ public class TicketService {
 
     private final TicketRepository ticketRepository;
     private final UserRepository userRepository;
+    private final TicketReadService ticketReadService;
+    private final TicketEventOutboxRepository outboxRepository;
 
-    public TicketService(TicketRepository ticketRepository, UserRepository userRepository) {
+    public TicketService(
+            TicketRepository ticketRepository,
+            UserRepository userRepository,
+            TicketReadService ticketReadService,
+            TicketEventOutboxRepository outboxRepository) {
         this.ticketRepository = ticketRepository;
         this.userRepository = userRepository;
+        this.ticketReadService = ticketReadService;
+        this.outboxRepository = outboxRepository;
     }
 
     @Transactional
@@ -39,7 +52,9 @@ public class TicketService {
                 .status(TicketStatus.OPEN)
                 .owner(owner)
                 .build();
-        return TicketResponse.from(ticketRepository.save(ticket));
+        Ticket saved = ticketRepository.save(ticket);
+        outboxRepository.save(TicketEventOutbox.from(TicketEvent.created(saved)));
+        return TicketResponse.from(saved);
     }
 
     @Transactional(readOnly = true)
@@ -53,12 +68,13 @@ public class TicketService {
 
     @Transactional(readOnly = true)
     public TicketResponse getById(Long id, String actorEmail) {
-        Ticket ticket = requireTicket(id);
-        assertCanAccess(ticket, actorEmail);
-        return TicketResponse.from(ticket);
+        TicketResponse ticket = ticketReadService.getById(id);
+        assertCanAccess(ticket.ownerEmail(), actorEmail);
+        return ticket;
     }
 
     @Transactional
+    @CacheEvict(cacheNames = "ticketById", key = "#id")
     public TicketResponse update(Long id, TicketRequest req, String actorEmail) {
         Ticket ticket = requireTicket(id);
         assertCanAccess(ticket, actorEmail);
@@ -73,6 +89,7 @@ public class TicketService {
 
     /** Transisi status hanya boleh dilakukan AGENT/ADMIN. */
     @Transactional
+    @CacheEvict(cacheNames = "ticketById", key = "#id")
     public TicketResponse changeStatus(Long id, TicketStatus newStatus, String actorEmail) {
         User actor = requireUser(actorEmail);
         if (!isPrivileged(actor)) {
@@ -80,15 +97,21 @@ public class TicketService {
         }
 
         Ticket ticket = requireTicket(id);
+        if (ticket.getStatus() == newStatus) {
+            return TicketResponse.from(ticket);
+        }
         ticket.setStatus(newStatus);
 
         boolean done = newStatus == TicketStatus.RESOLVED || newStatus == TicketStatus.CLOSED;
         ticket.setResolvedAt(done ? Instant.now() : null);
 
-        return TicketResponse.from(ticketRepository.save(ticket));
+        Ticket saved = ticketRepository.save(ticket);
+        outboxRepository.save(TicketEventOutbox.from(TicketEvent.statusChanged(saved)));
+        return TicketResponse.from(saved);
     }
 
     @Transactional
+    @CacheEvict(cacheNames = "ticketById", key = "#id")
     public void delete(Long id, String actorEmail) {
         Ticket ticket = requireTicket(id);
         assertCanAccess(ticket, actorEmail);
@@ -113,11 +136,15 @@ public class TicketService {
 
     /** Pemilik tiket boleh akses miliknya sendiri; AGENT/ADMIN boleh akses semua. */
     private void assertCanAccess(Ticket ticket, String actorEmail) {
+        assertCanAccess(ticket.getOwner().getEmail(), actorEmail);
+    }
+
+    private void assertCanAccess(String ownerEmail, String actorEmail) {
         User actor = requireUser(actorEmail);
         if (isPrivileged(actor)) {
             return;
         }
-        if (!ticket.getOwner().getEmail().equals(actor.getEmail())) {
+        if (!ownerEmail.equals(actor.getEmail())) {
             throw new AccessDeniedException("Tiket ini bukan milik Anda");
         }
     }
