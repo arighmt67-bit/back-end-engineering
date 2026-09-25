@@ -1,176 +1,114 @@
-# Back-End Engineering Portfolio Showcase
+# Proyek Back-End yang Saya Kerjakan
 
 [![Back-End Monorepo CI](https://github.com/arighmt67-bit/back-end-engineering/actions/workflows/ci.yml/badge.svg)](https://github.com/arighmt67-bit/back-end-engineering/actions/workflows/ci.yml)
 
-Monorepo portofolio back-end: seluruh submission **Dicoding Back-End Developer, Cloud Computing & Systems Learning Path** ditambah latihan mandiri di luar kurikulum, mencakup lima spesialisasi:
-1. **Track JavaScript / Node.js Back-End Developer (dengan AWS Cloud)**
-2. **Track Python Back-End Developer & Google Cloud Platform (GCP)**
-3. **Track Machine Learning Deployment di Google Cloud Platform (GCP & TensorFlow.js)**
-4. **Track Systems Programming & CLI Development dengan Rust**
-5. **Track Enterprise Back-End dengan Java & Spring Boot** — latihan mandiri, bukan submission Dicoding
+Repo ini berisi proyek-proyek yang saya kerjakan selama belajar back-end engineering. Isinya bukan satu aplikasi besar: sebagian berasal dari submission Dicoding, sebagian berupa lab kecil untuk memahami konsep tertentu, dan sisanya adalah latihan mandiri untuk mencoba hal yang belum dibahas di kelas.
 
-Seluruh track divalidasi satu pipeline CI: lint Node.js, pytest, `mvn verify` + gerbang coverage JaCoCo, dan `cargo test`. Setiap perubahan masuk lewat Pull Request, bukan push langsung ke `main`.
+Saya memulai dari REST API sederhana di Node.js, lalu beranjak ke autentikasi, database, caching, message broker, background worker, deployment cloud, dan pengujian otomatis. Proyek Java di repo ini adalah latihan mandiri; bukan submission Dicoding.
 
----
+## Mulai dari mana?
 
-## 🧰 Ringkasan Bahasa & Cloud Provider yang Digunakan
+Kalau hanya ingin melihat beberapa proyek yang paling mewakili proses belajar saya, mulai dari sini:
 
-* **Bahasa Pemrograman & Frameworks**:
-  * **Rust**: Rust 2021 Edition, CLI Parsing via `clap` (Derive feature), Serialization via `serde` & `serde_json`, Native Memory Safety, Zero-Cost Abstractions.
-  * **JavaScript (Node.js)**: ES6+, CommonJS, Native Asynchronous / Event-Loop, Hapi.js Framework, Express.js.
-  * **Machine Learning Runtime**: TensorFlow.js (`@tensorflow/tfjs`), MobileNetV3 Graph Model inference.
-  * **Java**: Java 17, Spring Boot 3.5.3, Spring Security (JWT stateless), Spring Data JPA/Hibernate, Bean Validation, JUnit 5 + MockMvc, JaCoCo coverage gate, Maven Enforcer.
-  * **Python**: Python 3.11+, Django REST Framework (DRF), ASGI/WSGI.
-  * **PHP**: Digunakan pada modul arsitektur cloud App Engine (CodeIgniter MVC frontend).
-* **Database, Storage & Caching**:
-  * **NoSQL Database**: Google Cloud Firestore (Native Mode, root collection `predictions`).
-  * **Relational DB**: PostgreSQL, MySQL, Cloud SQL.
-  * **Cache & Memory Store**: Redis (Cache-aside pattern, invalidation, TTL).
-  * **Message Broker & Asynchronous Tasks**: Apache Kafka, transactional outbox, RabbitMQ (AMQP), Celery, Redis Broker.
-  * **Local File Storage & Persistence**: JSON File I/O (`conversion.json`).
-* **Cloud & Infrastructure**:
-  * **Amazon Web Services (AWS)**: EC2 (Ubuntu 22.04 LTS), Elastic IP, EBS, Security Groups, SSH Key Pair, PM2 Process Manager, automated Continuous Deployment via GitHub Actions (`appleboy/ssh-action`).
-  * **Google Cloud Platform (GCP)**:
-    * **Serverless & Containers**: Google Cloud Run (Fully Managed, auto-scaling 0-2 instance, zero-cost blueprint), Google App Engine (GAE Standard F1 Node.js 22), Artifact Registry.
-    * **Compute**: Google Compute Engine (GCE - IaaS Virtual Machine & Startup Script), Google Kubernetes Engine (GKE - Managed K8s).
-    * **Storage**: Google Cloud Storage (GCS - Object Storage bucket untuk ML weights & static assets), MinIO S3-compatible storage.
-    * **Networking & Resilience**: Cloud Load Balancing, Managed Instance Groups (MIG), Custom Mode VPC, Network Firewall Rules, Cloud Monitoring Dashboards.
-    * **Security & IAM**: Principle of Least Privilege role binding untuk auditor reviewer.
+### 1. [Helpdesk event pipeline](04-backend-java-spring/a-helpdesk-api)
 
----
+Latihan mandiri terbaru saya untuk memahami apa yang terjadi ketika sebuah API mulai bergantung pada beberapa service. Aplikasi utamanya adalah REST API Spring Boot dengan JWT dan kontrol akses. PostgreSQL menyimpan data utama, Redis digunakan sebagai cache untuk pembacaan tiket, dan Kafka membawa event ke notification worker.
 
-## 🗺️ Master Directory Structure
+Bagian yang paling banyak saya pelajari bukan CRUD-nya, melainkan cara menghadapi kegagalan: cache dibuat *fail-open*, perubahan tiket dan event dicatat melalui transactional outbox, lalu worker mencegah event yang sama diproses dua kali. Stack lengkapnya dapat dijalankan dengan Docker Compose dan diuji dengan skenario Redis maupun Kafka berhenti sementara.
+
+- Java 17, Spring Boot, PostgreSQL, Redis, Kafka, Flyway
+- 73 test pada API dan 11 test pada worker
+- CI menjalankan build, coverage gate, validasi Compose, dan smoke test alur event
+- Dokumentasi: [Helpdesk Ticketing API](04-backend-java-spring/a-helpdesk-api/README.md)
+
+### 2. [Forum API](01-backend-javascript/d-expert-forum-api)
+
+API forum dengan registrasi, autentikasi JWT, thread, komentar, balasan, dan like. Di proyek ini saya berlatih memisahkan domain, use case, interface, dan infrastructure dengan Clean Architecture.
+
+Struktur tersebut membantu saat menulis test dan mengganti implementasi repository, tetapi juga menunjukkan bahwa semakin banyak lapisan berarti semakin banyak kode yang harus dijaga. Karena itu, saya tidak menganggap pola ini sebagai jawaban untuk semua API; manfaatnya baru terasa ketika aturan bisnis dan ketergantungan mulai bertambah.
+
+- Node.js, Express, PostgreSQL, JWT
+- Unit, integration, dan functional test
+- Versi terpisah: [repo `forum-api`](https://github.com/arighmt67-bit/forum-api) dengan [CI untuk lint dan test](https://github.com/arighmt67-bit/forum-api/actions/workflows/ci.yml)
+- Dokumentasi di monorepo: [Forum API](01-backend-javascript/d-expert-forum-api/README.md)
+
+### 3. [DicoEvent API](02-backend-python-gcp/d-fundamental-python-dicoevent)
+
+REST API pengelolaan event yang dibuat dalam dua tahap. Versi pertama berfokus pada model data, JWT, dan role-based access control. Versi kedua menambahkan Redis untuk cache, Celery untuk pekerjaan asinkron, MinIO untuk berkas, dan Loguru untuk pencatatan aplikasi.
+
+Proyek ini membuat saya lebih memahami bahwa menambahkan layanan bukan sekadar menambah daftar teknologi. Cache membutuhkan strategi invalidasi, pekerjaan latar belakang membutuhkan worker yang dipantau, dan penyimpanan objek membawa aturan validasi serta konfigurasi baru.
+
+- Python, Django REST Framework, PostgreSQL
+- Redis, Celery, MinIO, dan log terstruktur pada versi kedua
+- Dokumentasi: [DicoEvent](02-backend-python-gcp/d-fundamental-python-dicoevent/README.md)
+
+## Proyek lain di repo ini
+
+| Area | Proyek | Yang saya kerjakan |
+| --- | --- | --- |
+| JavaScript | [Bookshelf API](01-backend-javascript/a-pemula-bookshelf-api) | REST API buku dengan Hapi, validasi input, filter, dan pengujian Postman. |
+| JavaScript | [Node.js labs](01-backend-javascript/b-nodejs-developer-labs) | Latihan event loop, module system, promises, debugging, dan error handling. |
+| JavaScript | [OpenJob API & consumer](01-backend-javascript/c-fundamental-openjob-api) | PostgreSQL, Redis cache, upload PDF, RabbitMQ, dan worker pengirim email. |
+| Python | [OpenShop API](02-backend-python-gcp/b-pemula-python-openshop-api) | API katalog produk dengan Django REST Framework, filtering, dan test. |
+| Data | [ETL pipeline](02-backend-python-gcp/f-fundamental-pemrosesan-data-etl) | Extract, transform, dan load ke CSV, PostgreSQL, atau Google Sheets; setiap tahap diuji dengan pytest. |
+| Google Cloud | [Profile app](02-backend-python-gcp/a-cloud-engineer-profile-app) | Deployment aplikasi sederhana ke Compute Engine dengan startup script dan Nginx. |
+| Google Cloud | [Money Tracker](02-backend-python-gcp/c-cloud-engineer-money-tracker) | Backend dan frontend terpisah di App Engine, dengan Cloud SQL dan Cloud Storage. |
+| Google Cloud | [Notes API on Kubernetes](02-backend-python-gcp/e-cloud-architect-notes-api-k8s) | Container dan manifest Kubernetes untuk deployment ke GKE. |
+| ML deployment | [Asclepius](03-machine-learning-gcp/asclepius) | Backend inferensi TensorFlow.js di Cloud Run, model di Cloud Storage, dan riwayat prediksi di Firestore. |
+| Rust | [unitconv](05-rust-systems/unitconv) | CLI konversi suhu dan panjang dengan Clap, Serde, riwayat lokal, serta penanganan input tidak valid. |
+
+## Struktur repo
 
 ```text
-back-end-engineering/
-│
-├── 01-backend-javascript/
-│   ├── a-pemula-bookshelf-api/             # Belajar Back-End Pemula dengan JavaScript
-│   │   └── (Hapi.js, REST API CRUD, Postman Automated Tests)
-│   ├── b-nodejs-developer-labs/            # Menjadi Node.js Application Developer
-│   │   └── (Event Loop, Debugger/Inspector, Streams, Promises, Error Handling)
-│   ├── c-fundamental-openjob-api/          # Belajar Fundamental Back-End dengan JavaScript
-│   │   ├── openjob-api/                    # REST API, PostgreSQL, Redis Caching, RabbitMQ Producer, Multer
-│   │   └── openjob-consumer/               # Asynchronous Consumer, Nodemailer, Worker Service
-│   └── d-expert-forum-api/                 # Menjadi Back-End Developer Expert dengan JavaScript
-│       └── (Clean Architecture, DDD, TDD 100% Coverage, CI/CD ke AWS EC2, Nginx Rate Limiting)
-│
-├── 02-backend-python-gcp/
-│   ├── a-cloud-engineer-profile-app/       # Belajar Membuat Aplikasi Back-End Pemula dengan Google Cloud
-│   │   └── (GCE Virtual Machine, GCS Storage, Nginx, Automation Startup Scripts)
-│   ├── b-pemula-python-openshop-api/       # Belajar Back-End Pemula dengan Python
-│   │   └── (Django REST Framework, Model Serializers, Automated Testing)
-│   ├── c-cloud-engineer-money-tracker/     # Menjadi Google Cloud Engineer
-│   │   ├── money-tracker-backend/          # Node.js 22 di Google App Engine + Cloud SQL + GCS
-│   │   └── money-tracker-frontend/         # PHP CodeIgniter di GAE terhubung ke Backend API
-│   ├── d-fundamental-python-dicoevent/     # Belajar Fundamental Back-End dengan Python
-│   │   ├── versi-1/                        # DRF, JWT Authentication, Custom RBAC Permissions
-│   │   └── versi-2/                        # Celery Background Worker, Redis Cache, MinIO S3, Loguru
-│   └── e-cloud-architect-notes-api-k8s/    # Menjadi Google Cloud Architect
-│       ├── k8s/                            # Manifests K8s Deployment & LoadBalancer Service di GKE
-│       └── submission-arsitektur-andal/     # Managed Instance Group, VPC Custom, Load Balancer, Monitoring
-│
-├── 03-machine-learning-gcp/
-│   └── asclepius/                          # Belajar Penerapan Machine Learning dengan Google Cloud (Bintang 5)
-│       ├── backend/                        # Serverless Hapi.js API + TF.js on Cloud Run
-│       ├── frontend/                       # Web UI on App Engine Standard F1 (Node.js 22)
-│       ├── requirements.json               # Metadata Evaluasi Submission
-│       └── README.md                       # Dokumentasi Lengkap Arsitektur & Newman Test
-│
-├── 04-backend-java-spring/
-│   ├── a-helpdesk-api/                     # REST API, Redis cache, transactional outbox producer
-│   ├── b-notification-worker/              # Kafka consumer idempotent (unique event_id)
-│   ├── compose.yml                         # PostgreSQL, Redis, Kafka, API, worker
-│   └── scripts/                            # E2E smoke termasuk outage Redis/Kafka
-│
-└── 05-rust-systems/
-    └── unitconv/                           # Belajar Pemrograman Rust untuk Pemula (Bintang 5)
-        ├── Cargo.toml                      # Rust Manifest & Dependencies (clap, serde, serde_json)
-        ├── conversion.json                 # Local Persistent History File
-        ├── src/main.rs                     # Temperature & Length CLI Engine
-        └── README.md                       # Dokumentasi Perintah CLI & Pengujian
+01-backend-javascript/   # REST API, Node.js labs, dan message broker
+02-backend-python-gcp/   # Django, ETL, serta latihan deployment GCP
+03-machine-learning-gcp/ # deployment model TensorFlow.js
+04-backend-java-spring/  # helpdesk API dan notification worker (latihan mandiri)
+05-rust-systems/         # CLI unit converter
 ```
 
----
+Setiap proyek yang cukup besar memiliki README sendiri. Root README ini hanya menjadi peta agar pembaca tidak perlu menelusuri seluruh direktori untuk menemukan proyek yang relevan.
 
-## 📋 Detail Spesifikasi Tiap Modul
+## Pengujian dan CI
 
-### Track 1: Back-End Developer JavaScript
+Workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) berjalan pada pull request dan push ke `main`. Cakupannya sengaja ditulis secara spesifik karena belum semua submission lama memakai cara pengujian yang sama.
 
-| Sub-Modul | Course Dicoding | Tech Stack | Fitur & Arsitektur Utama |
-| :--- | :--- | :--- | :--- |
-| **`a-pemula-bookshelf-api`** | Belajar Back-End Pemula dengan JavaScript | Hapi.js, Node.js | Validasi payload JSON, full CRUD buku, query parameters filtering (name, reading, finished), lolos 100% tes otomasi Postman. |
-| **`b-nodejs-developer-labs`** | Menjadi Node.js Application Developer | Node.js Core, Inspect CDP, V8 | Diagnostic breakpoint, inspect mode, ESM/CJS module interoperability, custom EventEmitter, dynamic error handling, concurrent Promise resolution. |
-| **`c-fundamental-openjob-api`** | Belajar Fundamental Back-End dengan JavaScript | Node.js, Express, PostgreSQL, Redis, RabbitMQ | Otentikasi JWT (access & refresh token), upload berkas PDF ke storage lokal, server-side caching Redis 1 jam dengan header `X-Data-Source`, asynchronous message broker RabbitMQ dengan worker consumer pengirim email. |
-| **`d-expert-forum-api`** | Menjadi Back-End Developer Expert dengan JavaScript | Node.js, Hapi/Express, PostgreSQL, Vitest, Nginx, AWS EC2, PM2, GitHub Actions | Implementasi **Clean Architecture** (Entities, Domain, Use Cases, Interfaces, Frameworks/Infrastructures). Dependency Injection container, TDD dengan 100% coverage, automated CI/CD pipeline ke **AWS EC2**, reverse proxy Nginx hardening (Rate Limiting `/threads` 90r/m & HTTPS Let's Encrypt), PM2 zero-downtime reload. |
+| Job | Yang benar-benar diperiksa |
+| --- | --- |
+| `Node.js Lint & Static Checks` | ESLint pada Forum API dan Bookshelf API. |
+| `Python ETL Test Suite` | Test untuk tahap extract, transform, dan load pada proyek ETL. |
+| `Java Spring Boot Test & Coverage` | `mvn verify` untuk API dan worker, coverage gate, validasi Compose, serta smoke test termasuk simulasi gangguan Redis dan Kafka. |
+| `Rust Systems Check & Test` | `cargo check` dan `cargo test` untuk `unitconv`. |
 
----
+Branch `main` dilindungi oleh empat check tersebut. Perubahan dikirim melalui pull request, dan force push maupun penghapusan `main` dinonaktifkan.
 
-### Track 2: Back-End Developer Python & Google Cloud Platform (GCP)
+## Menjalankan proyek
 
-| Sub-Modul | Course Dicoding | Tech Stack / Cloud Services | Fitur & Arsitektur Utama |
-| :--- | :--- | :--- | :--- |
-| **`a-cloud-engineer-profile-app`** | Belajar Membuat Aplikasi Back-End Pemula dg GCP | GCP Compute Engine (GCE), Google Cloud Storage (GCS), Nginx | Provisioning VM Linux Ubuntu di region Jakarta (`asia-southeast2`), static asset hosting via GCS public bucket, bootstrap konfigurasi via metadata startup script. |
-| **`b-pemula-python-openshop-api`** | Belajar Back-End Pemula dengan Python | Python, Django REST Framework | REST API e-commerce katalog produk, model serializers, filtering, pagination, custom exceptions, unit testing DRF. |
-| **`c-cloud-engineer-money-tracker`** | Menjadi Google Cloud Engineer | GCP App Engine (Standard), Cloud SQL, Cloud Storage, Node.js, PHP | Arsitektur multi-service di GCP: backend API Node.js dan frontend PHP berjalan di App Engine, terhubung ke Cloud Storage bucket untuk upload bukti transaksi dan Cloud SQL database. |
-| **`d-fundamental-python-dicoevent`** | Belajar Fundamental Back-End dengan Python | Python, Django, Celery, Redis, MinIO S3, Loguru | **Versi 1**: Otentikasi JWT dengan granular Role-Based Access Control (RBAC).<br>**Versi 2**: Asynchronous task queue via Celery & Redis, object storage MinIO (S3 compatible), database caching Redis, structured rotating logging. |
-| **`e-cloud-architect-notes-api-k8s`** | Menjadi Google Cloud Architect | GCP GKE, Managed Instance Groups, Cloud Load Balancing, VPC | Desain arsitektur cloud berdaya tahan tinggi (High Availability & Scalability), orkestrasi container Notes API di Google Kubernetes Engine (GKE), konfigurasi auto-scaling MIG, Custom VPC, dan custom monitoring dashboard. |
+Clone repo, lalu masuk ke direktori proyek yang ingin dicoba:
 
----
+```bash
+git clone https://github.com/arighmt67-bit/back-end-engineering.git
+cd back-end-engineering
+```
 
-### Track 3: Machine Learning Deployment di Google Cloud (MLGC)
+Kebutuhan dan cara menjalankan tiap proyek berbeda, jadi ikuti README di direktori masing-masing. Sebagai contoh, Helpdesk API dapat dijalankan secara lokal dengan JDK 17 dan Maven Wrapper:
 
-| Sub-Modul | Course Dicoding | Tech Stack / Cloud Services | Fitur & Arsitektur Utama (Bintang 5) |
-| :--- | :--- | :--- | :--- |
-| **`03-machine-learning-gcp/asclepius`** | Belajar Penerapan Machine Learning dengan Google Cloud | Node.js, Hapi.js, TensorFlow.js (MobileNetV3), Cloud Run, App Engine, GCS, Firestore Native | **Target Evaluasi Bintang 5**:<br>• **Serverless Backend (Cloud Run)**: Auto-scaling 0-2 instance, otomatis memenuhi kriteria Compute Engine & Static IP tanpa biaya sewa IP statis.<br>• **Decoupled Model Storage (GCS)**: Model di-load dinamis dari bucket `gs://submissionmlgc-arirahmatr-model`.<br>• **NoSQL Database (Firestore Native)**: Endpoint GET `/predict/histories` & logging riwayat prediksi ke collection `predictions`.<br>• **Security & Least Privilege**: Hak akses auditor eksternal dibatasi spesifik (*Viewer/Reader only*).<br>• **Newman Tested**: 100% lolos 15/15 assertions Postman resmi Dicoding (201, 400, 413, 200). |
+```bash
+cd 04-backend-java-spring/a-helpdesk-api
+./mvnw spring-boot:run
+```
 
----
+Untuk menjalankan API, worker, PostgreSQL, Redis, dan Kafka sebagai satu alur, lihat bagian Docker Compose pada [dokumentasi Helpdesk API](04-backend-java-spring/a-helpdesk-api/README.md#event-pipeline-dan-docker-compose).
 
+## Catatan tentang status proyek
 
-### Track 4: Systems Programming & CLI Development (Rust)
+Repo ini adalah catatan belajar, bukan kumpulan layanan produksi yang selalu aktif. Beberapa resource AWS dan Google Cloud yang pernah dipakai untuk submission atau latihan sudah dimatikan setelah verifikasi agar tidak terus menimbulkan biaya. Kode sumber, konfigurasi, dan catatan arsitekturnya tetap disimpan di sini.
 
-| Sub-Modul | Course Dicoding | Tech Stack | Fitur & Arsitektur Utama (Bintang 5) |
-| :--- | :--- | :--- | :--- |
-| **`05-rust-systems/unitconv`** | Belajar Pemrograman Rust untuk Pemula | Rust 2021, Cargo, Clap v4, Serde, Serde JSON | **Target Evaluasi Bintang 5 (Advance)**:<br>• **Konversi Suhu & Panjang**: Mendukung `celsius`, `fahrenheit`, `kelvin`, `cm`, `inch`, `km`, dan `miles` dengan format angka presisi.<br>• **Subcommand List**: `unitconv list` menampilkan seluruh 7 satuan terkelompok kategori `[suhu]` dan `[panjang]`.<br>• **Ketahanan Data (Persistensi)**: Pencatatan riwayat otomatis ke berkas lokal `conversion.json` & audit riwayat via `unitconv history`.<br>• **Logika & Strict Error Handling**: Menolak satuan tak dikenal tanpa panic dan memblokir anomali konversi lintas kategori (`[panjang] cm → [suhu] celsius`). |
+Saya juga masih merapikan proyek-proyek lama agar standar dokumentasi dan pengujiannya lebih konsisten. Badge CI di atas menunjukkan kondisi pipeline saat ini, bukan jaminan bahwa setiap deployment cloud lama masih tersedia.
 
----
+## Tentang saya
 
-### Track 5: Enterprise Back-End dengan Java & Spring Boot
+Saya **Ari Rahmat Romadhon**. Latar belakang saya Sistem Informasi, dan saat ini saya memperdalam back-end, cloud, DevOps, serta security operations melalui proyek yang bisa saya bongkar dan uji sendiri.
 
-> Latihan mandiri di luar kurikulum Dicoding. Dokumentasi lengkap (endpoint, contoh `curl`, catatan 401 vs 403): [`04-backend-java-spring/a-helpdesk-api/README.md`](04-backend-java-spring/a-helpdesk-api/README.md).
->
-> Angka di bawah diambil dari artefak build nyata: **73 test API hijau** (66 unit + 7 integration), **11 test worker hijau**, **line coverage 89,9%**, **branch coverage 75,0%** (`target/site/jacoco`).
-
-| Sub-Modul | Fokus | Tech Stack | Fitur & Arsitektur Utama |
-| :--- | :--- | :--- | :--- |
-| **`04-backend-java-spring`** | Event-driven helpdesk (latihan mandiri) | Java 17, Spring Boot 3.5.3, PostgreSQL, Redis, Kafka, Flyway, Docker Compose | JWT/RBAC, cache-aside fail-open, transactional outbox at-least-once, worker idempotent via unique `event_id`, migration versioned, dan smoke outage Redis/Kafka. Bukti lokal: API 73/73, worker 11/11, coverage 89,9%/75,0%; runtime Compose juga digate di CI. |
-
----
-
-## 🔁 Alur Kerja & Kualitas
-
-Semua perubahan masuk lewat **Pull Request ke `main`** (trunk-based, tanpa branch `dev`/`staging` permanen), dan wajib hijau di pipeline [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
-
-| Job CI | Cakupan | Yang Divalidasi |
-| :--- | :--- | :--- |
-| `node-lint` | `01-backend-javascript` | `npm audit`, ESLint Forum API (expert) & Bookshelf API (pemula) |
-| `python-test` | `02-backend-python-gcp` | Instalasi dependency + `pytest` |
-| `java-test` | `04-backend-java-spring` | API + worker `mvn verify`, JaCoCo, validasi Compose, dan E2E smoke termasuk outage Redis/Kafka |
-| `rust-test` | `05-rust-systems` | `cargo check` + `cargo test` |
-
-Branch `main` dilindungi, jadi keempat job di atas berstatus **gerbang, bukan sekadar laporan**:
-
-* Keempat status check wajib hijau sebelum merge; `strict: true` berarti branch harus rebase/update ke `main` terkini dulu.
-* `enforce_admins: true` — aturan ini berlaku untuk pemilik repositori juga. Push langsung ke `main` ditolak server dengan `GH006: protected branch hook declined`, bukan sekadar peringatan yang bisa di-bypass.
-* Force push dan penghapusan branch `main` dimatikan.
-
-Yang sengaja **tidak** dipakai di sini: tag rilis `v*.*.*`. Repositori ini monorepo latihan yang masih bertambah modul dan tidak punya konsumen artefak (tidak ada yang menarik paket atau JAR-nya), sehingga versi semantik tidak akan punya makna kontrak yang bisa dipertanggungjawabkan. Penandaan rilis baru relevan bila salah satu modul dipisah menjadi artefak yang benar-benar dikonsumsi.
-
----
-
-## 👤 Author
-
-* **Nama**: Ari Rahmat Romadhon
-* **GitHub**: [@arighmt67-bit](https://github.com/arighmt67-bit)
-* **LinkedIn**: [Ari Rahmat Romadhon](https://www.linkedin.com/in/arirahmatr/)
-* **Platform**: Dicoding Indonesia - Back-End Developer, Cloud Computing & Systems Learning Paths
+- [GitHub](https://github.com/arighmt67-bit)
+- [LinkedIn](https://www.linkedin.com/in/arirahmatr/)
