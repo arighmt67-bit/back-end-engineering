@@ -1,8 +1,8 @@
 # Helpdesk Ticketing API
 
 [![Back-End Monorepo CI](https://github.com/arighmt67-bit/back-end-engineering/actions/workflows/ci.yml/badge.svg)](https://github.com/arighmt67-bit/back-end-engineering/actions/workflows/ci.yml)
-![Coverage](https://img.shields.io/badge/coverage-86%25%20line-brightgreen)
-![Tests](https://img.shields.io/badge/tests-51%20passed-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-89.9%25%20line-brightgreen)
+![Tests](https://img.shields.io/badge/tests-73%20passed-brightgreen)
 ![Java](https://img.shields.io/badge/Java-17-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.3-brightgreen)
 
@@ -48,6 +48,26 @@ export DB_USERNAME='helpdesk'
 export DB_PASSWORD='...'
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=prod
 ```
+
+---
+
+## Event pipeline dan Docker Compose
+
+Perubahan tiket dicatat ke **transactional outbox** dalam transaksi PostgreSQL yang sama.
+Relay mengirim kontrak JSON v1 ke Kafka setelah commit; worker menyimpan notification log
+dengan unique key `event_id`, sehingga retry/replay tetap idempotent. Cache detail tiket
+memakai Redis tetapi gagal-terbuka ke PostgreSQL.
+
+```bash
+cd 04-backend-java-spring
+export JWT_SECRET="$(python3 -c 'import secrets; print(secrets.token_urlsafe(48))')"
+docker compose up --build -d
+./scripts/smoke-helpdesk-event-pipeline.sh
+```
+
+Smoke test memvalidasi create → outbox → Kafka → worker, replay duplikat, fallback saat
+Redis mati, dan recovery pending outbox setelah Kafka pulih. Model Compose lima service
+sudah tervalidasi lokal; runtime smoke juga menjadi gate CI.
 
 ---
 
@@ -164,12 +184,13 @@ Format error seragam untuk semua kegagalan:
 
 ```text
 controller/   Lapisan HTTP, validasi payload, anotasi OpenAPI
-service/      Aturan bisnis: kepemilikan tiket, transisi status, agregasi report
-repository/   Spring Data JPA
-entity/       Model JPA: User, Ticket, enum Role/Status/Priority
-security/     JwtService, JwtAuthenticationFilter, RestAuthenticationEntryPoint
-exception/    GlobalExceptionHandler -> format ApiError seragam
-config/       SecurityConfig, OpenApiConfig
+service/      Aturan bisnis dan transactional outbox write
+repository/   Spring Data JPA + revision probe untuk cache freshness
+event/        Kontrak v1, Kafka publisher, scheduled outbox relay
+cache/        Redis cache-aside dengan PostgreSQL fallback
+entity/       User, Ticket, TicketEventOutbox, enum domain
+security/     JWT stateless dan authorization
+exception/    Format ApiError seragam
 ```
 
 Autentikasi memakai JWT tanpa sesi (`SessionCreationPolicy.STATELESS`), password
@@ -180,8 +201,8 @@ pemeriksaan kepemilikan di `TicketService` untuk hal halus.
 
 ## Pengujian
 
-51 test, seluruhnya hijau. Coverage garis **86%** (gerbang minimum 80% baris / 70% cabang,
-build gagal bila turun di bawahnya).
+73 test API, seluruhnya hijau (66 unit + 7 integration). Coverage **89,9% baris / 75,0%
+cabang**; gerbang minimum tetap 80% / 70%.
 
 ```bash
 ./mvnw clean verify                       # unit + integration + gerbang coverage
@@ -237,5 +258,5 @@ PASS  jjwt-runtime-scope  -> build GAGAL seperti yang diharapkan
 
 ## Teknologi
 
-Java 17 · Spring Boot 3.5.3 · Spring Security · Spring Data JPA · JJWT 0.12.6 ·
-springdoc-openapi 2.8.6 · H2 / PostgreSQL · Lombok · JUnit 5 · JaCoCo
+Java 17 · Spring Boot 3.5.3 · PostgreSQL · Flyway · Redis · Apache Kafka · Docker Compose ·
+Spring Security · JJWT 0.12.6 · JUnit 5 · JaCoCo

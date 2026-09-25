@@ -1,5 +1,6 @@
 package com.arirahmat.helpdesk.service;
 
+import com.arirahmat.helpdesk.cache.TicketReadService;
 import com.arirahmat.helpdesk.dto.TicketRequest;
 import com.arirahmat.helpdesk.dto.TicketResponse;
 import com.arirahmat.helpdesk.entity.Role;
@@ -7,7 +8,10 @@ import com.arirahmat.helpdesk.entity.Ticket;
 import com.arirahmat.helpdesk.entity.TicketPriority;
 import com.arirahmat.helpdesk.entity.TicketStatus;
 import com.arirahmat.helpdesk.entity.User;
+import com.arirahmat.helpdesk.entity.TicketEventOutbox;
+import com.arirahmat.helpdesk.event.TicketEvent;
 import com.arirahmat.helpdesk.exception.ResourceNotFoundException;
+import com.arirahmat.helpdesk.repository.TicketEventOutboxRepository;
 import com.arirahmat.helpdesk.repository.TicketRepository;
 import com.arirahmat.helpdesk.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -40,6 +44,12 @@ class TicketServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private TicketReadService ticketReadService;
+
+    @Mock
+    private TicketEventOutboxRepository outboxRepository;
 
     @InjectMocks
     private TicketService ticketService;
@@ -86,6 +96,47 @@ class TicketServiceTest {
     }
 
     @Test
+    @DisplayName("Create sukses menyimpan ticket.created.v1 ke transactional outbox")
+    void create_sukses_menyimpan_event_ke_outbox() {
+        User owner = user("user@example.com", Role.ROLE_USER);
+        mockUser(owner);
+        when(ticketRepository.save(any(Ticket.class))).thenAnswer(invocation -> {
+            Ticket saved = invocation.getArgument(0);
+            saved.setId(42L);
+            return saved;
+        });
+
+        ticketService.create(new TicketRequest("Judul", "Deskripsi", TicketPriority.HIGH),
+                owner.getEmail());
+
+        ArgumentCaptor<TicketEventOutbox> outbox = ArgumentCaptor.forClass(TicketEventOutbox.class);
+        verify(outboxRepository).save(outbox.capture());
+        TicketEvent event = outbox.getValue().toEvent();
+        assertThat(event.eventType()).isEqualTo(TicketEvent.CREATED);
+        assertThat(event.eventVersion()).isEqualTo(1);
+        assertThat(event.ticketId()).isEqualTo(42L);
+        assertThat(event.ownerEmail()).isEqualTo(owner.getEmail());
+        assertThat(event.status()).isEqualTo(TicketStatus.OPEN);
+        assertThat(event.eventId()).isNotNull();
+        assertThat(event.occurredAt()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Create gagal menyimpan tidak boleh menerbitkan event")
+    void create_gagal_save_tidak_menerbitkan_event() {
+        User owner = user("user@example.com", Role.ROLE_USER);
+        mockUser(owner);
+        when(ticketRepository.save(any(Ticket.class)))
+                .thenThrow(new IllegalStateException("database gagal"));
+
+        assertThatThrownBy(() -> ticketService.create(
+                new TicketRequest("Judul", "Deskripsi", null), owner.getEmail()))
+                .isInstanceOf(IllegalStateException.class);
+
+        verify(outboxRepository, never()).save(any());
+    }
+
+    @Test
     @DisplayName("Priority null pada request di-default ke MEDIUM")
     void create_priority_null_default_medium() {
         User owner = user("user@example.com", Role.ROLE_USER);
@@ -118,8 +169,8 @@ class TicketServiceTest {
     void getById_pemilik_boleh_akses() {
         User owner = user("user@example.com", Role.ROLE_USER);
         mockUser(owner);
-        when(ticketRepository.findByIdWithOwner(10L))
-                .thenReturn(Optional.of(ticket(10L, owner, TicketStatus.OPEN)));
+        when(ticketReadService.getById(10L))
+                .thenReturn(TicketResponse.from(ticket(10L, owner, TicketStatus.OPEN)));
 
         TicketResponse res = ticketService.getById(10L, owner.getEmail());
 
@@ -133,8 +184,8 @@ class TicketServiceTest {
         User owner = user("owner@example.com", Role.ROLE_USER);
         User penyusup = user("penyusup@example.com", Role.ROLE_USER);
         mockUser(penyusup);
-        when(ticketRepository.findByIdWithOwner(10L))
-                .thenReturn(Optional.of(ticket(10L, owner, TicketStatus.OPEN)));
+        when(ticketReadService.getById(10L))
+                .thenReturn(TicketResponse.from(ticket(10L, owner, TicketStatus.OPEN)));
 
         assertThatThrownBy(() -> ticketService.getById(10L, penyusup.getEmail()))
                 .isInstanceOf(AccessDeniedException.class);
@@ -146,16 +197,32 @@ class TicketServiceTest {
         User owner = user("owner@example.com", Role.ROLE_USER);
         User agent = user("agent@example.com", Role.ROLE_AGENT);
         mockUser(agent);
-        when(ticketRepository.findByIdWithOwner(10L))
-                .thenReturn(Optional.of(ticket(10L, owner, TicketStatus.OPEN)));
+        when(ticketReadService.getById(10L))
+                .thenReturn(TicketResponse.from(ticket(10L, owner, TicketStatus.OPEN)));
 
         assertThat(ticketService.getById(10L, agent.getEmail()).id()).isEqualTo(10L);
     }
 
     @Test
+    @DisplayName("Setiap request detail tetap mengotorisasi aktor meskipun response dapat berasal dari cache")
+    void getById_selalu_mengotorisasi_setiap_request() {
+        User owner = user("user@example.com", Role.ROLE_USER);
+        mockUser(owner);
+        when(ticketReadService.getById(10L))
+                .thenReturn(TicketResponse.from(ticket(10L, owner, TicketStatus.OPEN)));
+
+        ticketService.getById(10L, owner.getEmail());
+        ticketService.getById(10L, owner.getEmail());
+
+        verify(userRepository, org.mockito.Mockito.times(2)).findByEmail(owner.getEmail());
+        verify(ticketReadService, org.mockito.Mockito.times(2)).getById(10L);
+    }
+
+    @Test
     @DisplayName("Tiket yang tidak ada melempar ResourceNotFoundException")
     void getById_tiket_tidak_ada() {
-        when(ticketRepository.findByIdWithOwner(99L)).thenReturn(Optional.empty());
+        when(ticketReadService.getById(99L))
+                .thenThrow(new ResourceNotFoundException("Tiket tidak ditemukan dengan id 99"));
 
         assertThatThrownBy(() -> ticketService.getById(99L, "user@example.com"))
                 .isInstanceOf(ResourceNotFoundException.class)
@@ -191,6 +258,46 @@ class TicketServiceTest {
 
         assertThat(res.status()).isEqualTo(TicketStatus.RESOLVED);
         assertThat(res.resolvedAt()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Perubahan status sukses menyimpan status terbaru ke outbox")
+    void change_status_sukses_menyimpan_event_terbaru_ke_outbox() {
+        User owner = user("owner@example.com", Role.ROLE_USER);
+        User agent = user("agent@example.com", Role.ROLE_AGENT);
+        mockUser(agent);
+        Ticket ticket = ticket(10L, owner, TicketStatus.IN_PROGRESS);
+        when(ticketRepository.findByIdWithOwner(10L)).thenReturn(Optional.of(ticket));
+        when(ticketRepository.save(any(Ticket.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        ticketService.changeStatus(10L, TicketStatus.RESOLVED, agent.getEmail());
+
+        ArgumentCaptor<TicketEventOutbox> outbox = ArgumentCaptor.forClass(TicketEventOutbox.class);
+        verify(outboxRepository).save(outbox.capture());
+        TicketEvent event = outbox.getValue().toEvent();
+        assertThat(event.eventType()).isEqualTo(TicketEvent.STATUS_CHANGED);
+        assertThat(event.ticketId()).isEqualTo(10L);
+        assertThat(event.status()).isEqualTo(TicketStatus.RESOLVED);
+    }
+
+    @Test
+    @DisplayName("Status yang sama tidak menyimpan ulang atau menerbitkan event palsu")
+    void changeStatus_status_sama_adalah_noop() {
+        User owner = user("owner@example.com", Role.ROLE_USER);
+        User agent = user("agent@example.com", Role.ROLE_AGENT);
+        mockUser(agent);
+        Ticket ticket = ticket(10L, owner, TicketStatus.RESOLVED);
+        java.time.Instant resolvedAt = java.time.Instant.parse("2026-09-24T13:00:00Z");
+        ticket.setResolvedAt(resolvedAt);
+        when(ticketRepository.findByIdWithOwner(10L)).thenReturn(Optional.of(ticket));
+
+        TicketResponse response = ticketService.changeStatus(
+                10L, TicketStatus.RESOLVED, agent.getEmail());
+
+        assertThat(response.status()).isEqualTo(TicketStatus.RESOLVED);
+        assertThat(response.resolvedAt()).isEqualTo(resolvedAt);
+        verify(ticketRepository, never()).save(any());
+        verify(outboxRepository, never()).save(any());
     }
 
     @Test
